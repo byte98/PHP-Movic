@@ -1,4 +1,4 @@
-/# PHP-Movic - base platform for PHP applications.
+# PHP-Movic - base platform for PHP applications.
 # Copyright (C) 2024 Jiri Skoda <developer@skodaj.cz>
 # 
 # This program is free software; you can redistribute it and/or
@@ -16,6 +16,35 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
 
+#
 # This file contains configuration of whole PHP-Movic installation.
 # Documentation for whole PHP-Movic base platform can be found
-# at https://github.com/byte98
+# at https://github.com/byte98/PHP-Movic. There is also Wiki pages
+# describing this configuration file at
+# https://github.com/byte98/PHP-Movic/wiki/Configuration
+#
+
+# Default format of date used in application.
+# See https://github.com/byte98/PHP-Movic/wiki/Date-format
+DateFormat: "%0d%.%0m%.%y% %0H%:%0M%:%0S%.%U%"
+
+# Minimal level of log whihc will be actually outputted.
+# Allowed values: LOW, BASE, INFO, WARNING, ERROR, CRITICAL
+LogLevel: LOW
+
+# Directory where all log files will be stored.
+LogDir: "LOGS"
+
+
+
+# Name or address of the database server.
+DatabaseHost: "localhost"
+
+# Name of database to which application will connect to.
+DatabaseName: "php_movic"
+
+# Name of user with access to database.
+DatabaseUser: "username"
+
+# Password of user with access to database.
+DatabasePassword: "password"

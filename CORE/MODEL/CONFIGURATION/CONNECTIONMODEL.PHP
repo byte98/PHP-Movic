@@ -17,12 +17,13 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-namespace PHPMovic\Core\Model\Configuration;
+namespace PHPMovic\Model\Configuration;
 
 /**
  * Class representing model of connection to the database.
  */
-class ConnectionModel{
+class ConnectionModel
+{
 
     /**
      * Name of machine with database service running.
@@ -52,7 +53,8 @@ class ConnectionModel{
      * @param string $username Name of user with access to the database.
      * @param string $password Password of user with access to the database.
      */
-    public function __construct(string $hostname, string $database, string $username, string $password){
+    public function __construct(string $hostname, string $database, string $username, string $password)
+    {
         $this->hostname = $hostname;
         $this->database = $database;
         $this->username = $username;
@@ -63,7 +65,8 @@ class ConnectionModel{
      * Gets name of database used by application.
      * @return string Name of database used by application.
      */
-    public function getHostname(): string{
+    public function getHostname(): string
+    {
         return $this->hostname;
     }
 
@@ -71,7 +74,8 @@ class ConnectionModel{
      * Gets name of user with access to the database.
      * @return string Name of user with access to the database.
      */
-    public function getDatabase(): string{
+    public function getDatabase(): string
+    {
         return $this->database;
     }
 
@@ -79,7 +83,8 @@ class ConnectionModel{
      * Gets password of user with access to the database.
      * @return string Password of user with access to the database.
      */
-    public function getUsername(): string{
+    public function getUsername(): string
+    {
         return $this->username;
     }
 
@@ -87,7 +92,8 @@ class ConnectionModel{
      * Gets password of user with access to the database.
      * @return string Password of user with access to the database.
      */
-    public function getPassword(): string{
+    public function getPassword(): string
+    {
         return $this->password;
     }
 }
