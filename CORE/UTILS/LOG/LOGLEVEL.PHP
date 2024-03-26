@@ -45,6 +45,11 @@ enum LogLevel
     case Info;
 
     /**
+     * Log informing about successfull operation.
+     */
+    case Success;
+
+    /**
      * Log with some kind of warning.
      */
     case Warning;
@@ -72,9 +77,10 @@ enum LogLevel
             case LogLevel::Low:      $reti = 1;  break;
             case LogLevel::Base:     $reti = 2;  break;
             case LogLevel::Info:     $reti = 4;  break;
-            case LogLevel::Warning:  $reti = 8;  break;
-            case LogLevel::Error:    $reti = 16; break;
-            case LogLevel::Critical: $reti = 32; break;
+            case LogLevel::Success:  $reti = 8;  break;
+            case LogLevel::Warning:  $reti = 16; break;
+            case LogLevel::Error:    $reti = 32; break;
+            case LogLevel::Critical: $reti = 64; break;
         }
 
         return $reti;
@@ -93,6 +99,7 @@ enum LogLevel
             case LogLevel::Low:      $reti = "LOW";      break;
             case LogLevel::Base:     $reti = "BASE";     break;
             case LogLevel::Info:     $reti = "INFO";     break;
+            case LogLevel::Success:  $reti = "SUCCESS";  break;
             case LogLevel::Warning:  $reti = "WARNING";  break;
             case LogLevel::Error:    $reti = "ERROR";    break;
             case LogLevel::Critical: $reti = "CRITICAL"; break;
@@ -116,6 +123,7 @@ enum LogLevel
             case "LOW":      $reti = LogLevel::Low;       break;
             case "BASE":     $reti = LogLevel::Base;      break;
             case "INFO":     $reti = LogLevel::Info;      break;
+            case "SUCCESS":  $reti = LogLevel::Success;   break;
             case "WARNING":  $reti = LogLevel::Warning;   break;
             case "ERROR":    $reti = LogLevel::Error;     break;
             case "CRITICAL": $reti = LogLevel::Critical;  break;

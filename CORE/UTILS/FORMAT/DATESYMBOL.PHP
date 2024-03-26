@@ -1,5 +1,5 @@
 <?php
-use PHPMovic\Utils\StringUtils;
+
 // PHP-Movic - base platform for PHP applications.
 // Copyright (C) 2024 Jiri Skoda <developer@skodaj.cz>
 // 

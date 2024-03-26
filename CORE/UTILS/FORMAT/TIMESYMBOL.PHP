@@ -18,6 +18,8 @@
 // 
 
 namespace PHPMovic\Utils\Format;
+
+
 use PHPMovic\Utils\StringUtils;
 
 /**
@@ -107,6 +109,34 @@ enum TimeSymbol
             case "0S": $reti = TimeSymbol::ZeroSecond;      break;
             case "U":  $reti = TimeSymbol::Millisecond;     break;
             case "0U": $reti = TimeSymbol::ZeroMillisecond; break;
+            case "LP": $reti = TimeSymbol::PeriodLower;     break;
+            case "CP": $reti = TimeSymbol::PeriodUpper;     break;
+        }
+        return $reti;
+    }
+
+    /**
+     * Formats time according to time symbol.
+     * @param \DateTime $dateTime Date and time to format.
+     * @return string Formatted time.
+     */
+    public function format(\DateTime $dateTime): string
+    {
+        $reti = "";
+        switch($this)
+        {
+            case TimeSymbol::Hour24:          $reti = $dateTime->format("G");                            break;
+            case TimeSymbol::ZeroHour24:      $reti = $dateTime->format("H");                            break;
+            case TimeSymbol::Hour12:          $reti = $dateTime->format("g");                            break;
+            case TimeSymbol::ZeroHour12:      $reti = $dateTime->format("h");                            break;
+            case TimeSymbol::Minute:          $reti = strval(intval($dateTime->format("i")));            break;   
+            case TimeSymbol::ZeroMinute:      $reti = $dateTime->format("i");                            break;
+            case TimeSymbol::Second:          $reti = strval(intval($dateTime->format("s")));            break;
+            case TimeSymbol::ZeroSecond:      $reti = $dateTime->format("s");                            break;   
+            case TimeSymbol::Millisecond:     $reti = $dateTime->format("v");                            break;
+            case TimeSymbol::ZeroMillisecond: $reti = StringUtils::ppad($dateTime->format("v"), 4, "0"); break;
+            case TimeSymbol::PeriodLower:     $reti = $dateTime->format("a");                            break;
+            case TimeSymbol::PeriodUpper:     $reti = $dateTime->format("A");                            break;
         }
         return $reti;
     }

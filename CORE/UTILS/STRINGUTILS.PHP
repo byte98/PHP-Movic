@@ -51,6 +51,23 @@ abstract class StringUtils
         }
         return $reti;
     }
+
+    /**
+     * Padds string from right.
+     * @param string $str String to pad.
+     * @param int $length Desired length of returned string.
+     * @param string $char Character to pad with.
+     * @return string Padded string.
+     */
+    public static function ppad(string $str, int $length, string $char = " "): string
+    {
+        $reti = $str;
+        if (strlen($str) < $length)
+        {
+            $reti = $reti . str_repeat($char, $length - strlen($str));
+        }
+        return $reti;
+    }
 }
 
 ?>

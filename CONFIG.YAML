@@ -26,15 +26,26 @@
 
 # Default format of date used in application.
 # See https://github.com/byte98/PHP-Movic/wiki/Date-format
-DateFormat: "%0d%.%0m%.%y% %0H%:%0M%:%0S%.%U%"
+DateFormat: "%0d%.%0m%.%y% %0H%:%0M%:%0S%.%0U%"
 
 # Minimal level of log whihc will be actually outputted.
-# Allowed values: LOW, BASE, INFO, WARNING, ERROR, CRITICAL
+# Allowed values: LOW, BASE, INFO, SUCCESS, WARNING, ERROR, CRITICAL
 LogLevel: LOW
 
 # Directory where all log files will be stored.
 LogDir: "LOGS"
 
+# Flag, whether logs will be printed also to standard output.
+# Allowed values: True, False
+LogStdout: True
+
+# Format of logs.
+# See https://github.com/byte98/PHP-Movic/wiki/Log-format
+LogFormat: "%DATE% %TIME% [ %LEVEL ]: %MESSAGE%"
+
+# Flag, whether format symbols will be used when logging into file.
+# Allowed values: True, False
+LogUseFormat: False
 
 
 # Name or address of the database server.
