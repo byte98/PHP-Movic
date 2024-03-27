@@ -19,29 +19,25 @@
 
 namespace PHPMovic;
 
+use PHPMovic\Model\Configuration\Configuration;
+
 /**
  * Class which represents whole application.
  */
 class Application
 {
+    /**
+     * Configuration of whole application.
+     */
+    private readonly Configuration $configuration;
 
     /**
-     * Entry point of whole application execution.
+     * Creates new instance of application.
+     * @param Configuration $configuration Configuration of application.
      */
-    public static function main()
+    public function __construct(Configuration $configuration)
     {
-        // Define configuration file.
-        $file = $_SERVER["DOCUMENT_ROOT"] . "/CONFIG.YAML";
-
-        // Include bootloader.
-        require_once($_SERVER['DOCUMENT_ROOT'] . "/CORE/BOOTLOADER.PHP");
-
-        // Create bootloader.
-        $bootloader = new \PHPMovic\Bootloader($file);
-
-        // Initialize application.
-        $bootloader->load();
-
+        $this->configuration = $configuration;
     }
 }
 

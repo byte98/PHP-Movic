@@ -17,8 +17,34 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-require_once($_SERVER["DOCUMENT_ROOT"] . "/CORE/MAIN.PHP");
+namespace PHPMovic;
 
-\PHPMovic\Main::main();
+/**
+ * Main class of whole application.
+ */
+class Main
+{
+    /**
+     * Main function of whole application.
+     * This function will be run at start of application.
+     */
+    public static function main(): void
+    {
+        // Define configuration file.
+        $file = $_SERVER["DOCUMENT_ROOT"] . "/CONFIG.YAML";
+
+        // Include bootloader.
+        require_once($_SERVER['DOCUMENT_ROOT'] . "/CORE/BOOTLOADER.PHP");
+
+        // Create bootloader.
+        $bootloader = new \PHPMovic\Bootloader($file);
+
+        // Initialize application.
+        $bootloader->load();
+
+        
+    }
+}
 
 ?>
+

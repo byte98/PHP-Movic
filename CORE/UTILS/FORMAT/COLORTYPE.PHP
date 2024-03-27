@@ -17,8 +17,23 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-require_once($_SERVER["DOCUMENT_ROOT"] . "/CORE/MAIN.PHP");
+namespace PHPMovic\Utils\Format;
 
-\PHPMovic\Main::main();
+/**
+ * Enumeration of two basic types of color.
+ */
+enum ColorType
+{
+    /**
+     * The color is used for the background.
+     */
+    case Background;
+
+    /**
+     * The color is used for the foreground.
+     */
+    case Foreground;
+
+}
 
 ?>

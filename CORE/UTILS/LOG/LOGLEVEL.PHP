@@ -148,6 +148,17 @@ enum LogLevel
         }
         return $reti;
     }
+
+    /**
+     * Checks if this log level is greater than or equals to given log level.
+     * @param LogLevel $other Log level to compare with.
+     * @return bool TRUE if this log level is greater or equals to given log level,
+     *              FALSE otherwise.
+     */
+    public function isGreaterOrEquals(LogLevel $other): bool
+    {
+        return $this->getWeight() >= $other->getWeight();
+    }
 }
 
 ?>

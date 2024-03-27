@@ -26,7 +26,20 @@
 
 # Default format of date used in application.
 # See https://github.com/byte98/PHP-Movic/wiki/Date-format
-DateFormat: "%0d%.%0m%.%y% %0H%:%0M%:%0S%.%0U%"
+DateFormat: "%0d%-%0m%-%y% %0H%:%0M%:%0S%.%0U%"
+
+
+# Flag, whether PHP errors should be displayed or not.
+# Allowed values:
+#   True: display PHP errors
+#   False: do not display PHP errors
+PHPErrors: True
+
+# Flag, whether application should make logs.
+# Allowed values:
+#   True: make logs
+#   False: do not make logs
+LogsAllowed: True
 
 # Minimal level of log whihc will be actually outputted.
 # Allowed values: LOW, BASE, INFO, SUCCESS, WARNING, ERROR, CRITICAL
@@ -41,12 +54,29 @@ LogStdout: True
 
 # Format of logs.
 # See https://github.com/byte98/PHP-Movic/wiki/Log-format
-LogFormat: "%DATE% %TIME% [ %LEVEL ]: %MESSAGE%"
+LogFormat: "%DATE% [ %LEVEL ]: %MESSAGE%"
 
 # Flag, whether format symbols will be used when logging into file.
 # Allowed values: True, False
 LogUseFormat: False
 
+# Specifies format of log by level.
+# Syntax:
+# LogLevelFormat:
+#    <level>: "<format">
+#    <level>: "<format>"
+#    ...
+# where <level> is one of: LOW, BASE, INFO, SUCCESS, WARNING, ERROR, CRITICAL
+# and <format> is format string of log (same as LogFormat)
+# This setting overrides LogFormat.
+LogLevelFormat:
+    LOW: "%I%%CF[GRAY]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
+    BASE: "%CF[WHITE]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
+    INFO: "%CF[CYAN]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
+    SUCCESS: "%CF[GREEN]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
+    WARNING: "%CF[YELLOW]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
+    ERROR: "%CF[RED]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
+    CRITICAL: "%B%%CF[WHITE]%%CB[RED]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
 
 # Name or address of the database server.
 DatabaseHost: "localhost"

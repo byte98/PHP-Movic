@@ -19,6 +19,11 @@
 
 namespace PHPMovic;
 
+
+use PHPMovic\Application;
+use PHPMovic\Model\Configuration\Configuration;
+use PHPMovic\Model\Configuration\ConfigurationLoader;
+
 /**
  * Class which provides initial loading of application.
  */
@@ -30,6 +35,12 @@ class Bootloader
     private readonly string $configFile;
 
     /**
+     * Configuration loaded from provided file.
+     */
+    private Configuration $configuration;
+
+
+    /**
      * Creates new initial loader.
      */
     public function __construct(string $configFile)
@@ -39,10 +50,22 @@ class Bootloader
 
     /**
      * Performs initial loading of application.
+     * @return Application New instance of application.
      */
-    public function load(): void
+    public function load(): Application
     {
         $this->enableAutoLoad();
+        $this->loadCongfiugration();
+        return new Application($this->configuration);
+    }
+
+    /**
+     * Performs loading of application.
+     */
+    private function loadCongfiugration()
+    {
+        $loader = new ConfigurationLoader($this->configFile);
+        $this->configuration = $loader->getConfiguration();
     }
 
     /**
@@ -53,7 +76,6 @@ class Bootloader
         spl_autoload_register(function($className)
         {
             $path = Bootloader::determineClassPath($className);
-            echo $className . " -> " . $path . "<br>";
             if (file_exists($path))
             {
                 require_once($path);

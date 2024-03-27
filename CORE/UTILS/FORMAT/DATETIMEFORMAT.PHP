@@ -28,6 +28,7 @@ use PHPMovic\Utils\Format\TimeSymbol;
  */
 class DateTimeFormat
 {
+    
     /**
      * Symbols contained in format.
      */
