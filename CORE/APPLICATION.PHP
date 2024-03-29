@@ -20,6 +20,7 @@
 namespace PHPMovic;
 
 use PHPMovic\Model\Configuration\Configuration;
+use PHPMovic\Utils\Log\Logger;
 
 /**
  * Class which represents whole application.
@@ -32,12 +33,27 @@ class Application
     private readonly Configuration $configuration;
 
     /**
+     * Logger of whole application.
+     */
+    private static Logger $logger;
+
+    /**
      * Creates new instance of application.
      * @param Configuration $configuration Configuration of application.
      */
     public function __construct(Configuration $configuration)
     {
         $this->configuration = $configuration;
+        Application::$logger = new Logger($configuration->getLogModel(), $configuration->getDateTimeFormat());
+    }
+
+    /**
+     * Gets logger of application.
+     * @return Logger Logger of application.
+     */
+    public static function logger(): Logger
+    {
+        return Application::$logger;
     }
 }
 

@@ -27,7 +27,7 @@ use PHPMovic\Utils\Log\LogLevel;
 /**
  * Class which performs logging.
  */
-class logger
+class Logger
 {
     /**
      * Model of logger defining behaviour of logger.
@@ -125,7 +125,7 @@ class logger
     {
         fwrite(\STDOUT, $text);
     }
-
+    updating
     /**
      * Handles log and performs logging.
      * @param Log $log Log to be logged.
@@ -160,7 +160,7 @@ class logger
      * @param string $message Message of log.
      */
     public function low(string $message): void
-    {
+    {updating
         $this->log(LogLevel::Low, $message);
     }
 

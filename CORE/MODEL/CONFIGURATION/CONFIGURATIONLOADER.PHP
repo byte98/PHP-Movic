@@ -65,7 +65,6 @@ class ConfigurationLoader
             $this->getConnectionModel($data),
             $this->getLogModel($data)
         );
-        var_dump($this->configuration);
     }
 
     /**
