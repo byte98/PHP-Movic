@@ -20,6 +20,7 @@
 namespace PHPMovic\Utils\Log;
 
 use PHPMovic\Utils\Log\LogLevel;
+use PHPMovic\Utils\DateUtils;
 
 /**
  * Class which represents one single log of application.
@@ -47,11 +48,22 @@ class Log
      * @param LogLevel $level Level of log.
      * @param \DateTime $date Date and time of log creation.
      */
-    public function __construct(string $message, LogLevel $level, \DateTime $date = new \DateTime())
+    public function __construct(string $message, LogLevel $level, \DateTime $date)
     {
         $this->message = $message;
         $this->level = $level;
         $this->date = $date;
+    }
+
+    /**
+     * Creates new log with actual date and time.
+     * @param string $message Message connected with log.
+     * @param LogLevel $level Level of log.
+     * @return Log New log with actual date and time.
+     */
+    public static function createNow(string $message, LogLevel $level): Log
+    {
+        return new Log($message, $level, DateUtils::now());
     }
 
     /**

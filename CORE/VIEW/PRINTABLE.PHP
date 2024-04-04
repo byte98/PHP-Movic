@@ -17,40 +17,44 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-namespace PHPMovic;
+namespace PHPMovic\View;
+
+use PHPMovic\Model\Server\ViewData;
 
 /**
- * Main class of whole application.
+ * Class which wraps data to be printable.
  */
-class Main
+class Printable
 {
     /**
-     * Main function of whole application.
-     * This function will be run at start of application.
+     * Data which will be wrapped to be printable.
      */
-    public static function main(): void
+    private readonly ViewData $data;
+
+    /**
+     * Creates new wrapper of data.
+     * @param ViewData $data Data to wrap.
+     */
+    public function __construct(ViewData $data)
     {
-        // Define configuration file.
-        $file = $_SERVER["DOCUMENT_ROOT"] . "/CONFIG.YAML";
+        $this->data = $data;
+    }
 
-        // Include bootloader.
-        require_once($_SERVER['DOCUMENT_ROOT'] . "/CORE/BOOTLOADER.PHP");
-
-        // Create bootloader.
-        $bootloader = new \PHPMovic\Bootloader($file);
-
-        // Initialize application.
-        // (from this point, there is no need for including files directly,
-        //  because bootloader enables files auto-loading)
-        $application = $bootloader->load();
-
-        // Create request.
-        $request = new \PHPMovic\Model\Server\Request();
-
-        // Handle request.
-        $application->run($request);
+    /**
+     * Prints data.
+     * @param string $key Identifier of data.
+     * @return bool TRUE if data can be printed,
+     *              FALSE otherwise.
+     */
+    public function __invoke(string $key): bool
+    {
+        $reti = $this->data->exists($key);
+        if ($reti == true)
+        {
+            $this->data->print($key);
+        }
+        return $reti;
     }
 }
 
 ?>
-

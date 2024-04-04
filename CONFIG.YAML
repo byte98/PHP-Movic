@@ -28,12 +28,25 @@
 # See https://github.com/byte98/PHP-Movic/wiki/Date-format
 DateFormat: "%0d%-%0m%-%y% %0H%:%0M%:%0S%.%0U%"
 
+# Default time zone for whole application.
+# For more information, please see https://www.php.net/manual/en/timezones.php.
+Timezone: "Europe/Prague"
+
 
 # Flag, whether PHP errors should be displayed or not.
 # Allowed values:
 #   True: display PHP errors
 #   False: do not display PHP errors
 PHPErrors: True
+
+# Namespace of all user content. All classes in /CONTENT folder
+# are expected to be in this namespace.
+# Example: assuming ContentNamespace is "MyApp"
+#          class "MyApp\Controller\SuperController" is expected to
+#          be in file "/CONTENT/CONTROLLER/SUPERCONTROLLER.PHP"
+# Note: this setting (with pathing mentioned in example above) is
+# case insensitive. So, namespace "MyApp" is the same as "MYAPP".
+ContentNamespace: "MyApp"
 
 # Flag, whether application should make logs.
 # Allowed values:
@@ -54,7 +67,7 @@ LogStdout: True
 
 # Format of logs.
 # See https://github.com/byte98/PHP-Movic/wiki/Log-format
-LogFormat: "%DATE% [ %LEVEL ]: %MESSAGE%"
+LogFormat: "%DATE% [ %PDLVL% ]: %MESSAGE%"
 
 # Flag, whether format symbols will be used when logging into file.
 # Allowed values: True, False
@@ -70,13 +83,20 @@ LogUseFormat: False
 # and <format> is format string of log (same as LogFormat)
 # This setting overrides LogFormat.
 LogLevelFormat:
-    LOW: "%I%%CF[GRAY]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
-    BASE: "%CF[WHITE]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
-    INFO: "%CF[CYAN]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
-    SUCCESS: "%CF[GREEN]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
-    WARNING: "%CF[YELLOW]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
-    ERROR: "%CF[RED]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
-    CRITICAL: "%B%%CF[WHITE]%%CB[RED]%%DATE% [ %LEVEL ]: %MESSAGE%%FR%"
+    LOW: "%I%%CF[GRAY]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    BASE: "%CF[WHITE]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    INFO: "%CF[CYAN]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    SUCCESS: "%CF[GREEN]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    WARNING: "%CF[YELLOW]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    ERROR: "%CF[RED]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    CRITICAL: "%B%%CF[WHITE]%%CB[RED]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+
+# Flag, whether logs should be also printed
+# to browser console.
+# Allowed values: True, False
+#
+# Note: this setting is also affected by LogUseFormat.
+LogConsole: True
 
 # Name or address of the database server.
 DatabaseHost: "localhost"
@@ -89,3 +109,29 @@ DatabaseUser: "username"
 
 # Password of user with access to database.
 DatabasePassword: "password"
+
+# Definition of routes of application.
+# Syntax:
+# Routes:
+#    "<route>": "<controller>"
+#    "<route>": "<controller>"
+#    "<route>": "<controller>"
+#    ...
+# Where <route> is any path and <controller> is name of class.
+# For more, please see 
+# https://github.com/byte98/PHP-Movic/wiki/Configuration#routes
+Routes:
+    "/": "HomePageController"
+    "/id/%ID::INTEGER%": "IdController"
+
+# Definitions of routes to static content.
+# Syntax:
+# StaticRoutes:
+#    "<route>": "<path>"
+#    "<route>": "<path>"
+#    ...
+# Where <route> is any path of request and <path> is path
+# to folder within /CONTENT folder.
+StaticRoutes:
+    "/static/css": "/STYLES"
+    "/static/js": "/SCRIPTS"

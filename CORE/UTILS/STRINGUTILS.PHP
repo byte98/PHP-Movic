@@ -59,7 +59,7 @@ abstract class StringUtils
      * @param string $char Character to pad with.
      * @return string Padded string.
      */
-    public static function ppad(string $str, int $length, string $char = " "): string
+    public static function rpad(string $str, int $length, string $char = " "): string
     {
         $reti = $str;
         if (strlen($str) < $length)
@@ -67,6 +67,43 @@ abstract class StringUtils
             $reti = $reti . str_repeat($char, $length - strlen($str));
         }
         return $reti;
+    }
+
+    /**
+     * Pads string from both sides.
+     * @param string $str String to pad.
+     * @param int $length Desired length of returned string.
+     * @param string $char Character to pad with.
+     * @return string Padded string.
+     */
+    public static function pad(string $str, int $length, string $char = " "): string
+    {
+        $reti = $str;
+        $diff = $length - strlen($str);
+        if ($diff > 0)
+        {
+            $left = intval(floor(floatval($diff) / 2.0));
+            $right = $diff - $left;
+            if ($left > $right)
+            {
+                $tmp = $right;
+                $right = $left;
+                $left = $tmp;
+            }
+            $reti = StringUtils::lpad($str, strlen($str) +$left, $char);
+            $reti = StringUtils::rpad($reti, strlen($reti) + $right, $char);
+        }
+        return $reti;
+    }
+
+    /**
+     * Gets integer part of float.
+     * @param float $number Number to get integer part of.
+     * @return string Integer part of number.
+     */
+    public static function intFloat(float $number): string
+    {
+        return strval(intval($number));
     }
 }
 

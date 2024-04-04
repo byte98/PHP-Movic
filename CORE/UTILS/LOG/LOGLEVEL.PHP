@@ -159,6 +159,25 @@ enum LogLevel
     {
         return $this->getWeight() >= $other->getWeight();
     }
+
+    /**
+     * Gets longest string representation of log level.
+     * @return int Length of longest string representation of log level.
+     */
+    public static function longestString(): int
+    {
+        $reti = PHP_INT_MIN;
+        foreach(LogLevel::cases() as $level)
+        {
+            $str = $level->toString();
+            $strlen = strlen($str);
+            if ($strlen > $reti)
+            {
+                $reti = $strlen;
+            }
+        }
+        return $reti;
+    }
 }
 
 ?>

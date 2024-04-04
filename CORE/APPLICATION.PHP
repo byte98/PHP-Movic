@@ -20,7 +20,13 @@
 namespace PHPMovic;
 
 use PHPMovic\Model\Configuration\Configuration;
+use PHPMovic\Router\Router;
 use PHPMovic\Utils\Log\Logger;
+use PHPMovic\SourceLoader;
+use PHPMovic\Bootloader;
+use PHPMovic\Model\Server\Request;
+use PHPMovic\Model\Server\HttpMethod;
+use PHPMovic\Utils\StringUtils;
 
 /**
  * Class which represents whole application.
@@ -35,16 +41,88 @@ class Application
     /**
      * Logger of whole application.
      */
-    private static Logger $logger;
+    private static ?Logger $logger = null;
+
+    /**
+     * Source loader of external source code.
+     */
+    private static ?SourceLoader $sourceLoader = null;
+
+    /**
+     * Bootloader of whole application.
+     */
+    private readonly Bootloader $bootloader;
+
+    /**
+     * Router of the application.
+     */
+    private readonly Router $router;
 
     /**
      * Creates new instance of application.
+     * @param Bootloader $bootloader Bootloader of whole application.
      * @param Configuration $configuration Configuration of application.
      */
-    public function __construct(Configuration $configuration)
+    public function __construct(Bootloader $bootloader, Configuration $configuration)
     {
+        $this->bootloader = $bootloader;
         $this->configuration = $configuration;
         Application::$logger = new Logger($configuration->getLogModel(), $configuration->getDateTimeFormat());
+        Application::$sourceLoader = new SourceLoader($configuration->getSourcesModel());
+        $this->changeAutoloader();
+        $this->router = new Router($this->configuration);
+        $this->init();
+    }
+
+    /**
+     * Changes default autoloader of classes.
+     */
+    private function changeAutoloader(): void
+    {
+        spl_autoload_register(Application::$sourceLoader);
+        spl_autoload_unregister($this->bootloader->getBaseLoader());
+    }
+
+    /**
+     * Initializes application according to the configuration.
+     */
+    private function init(): void
+    {
+        if ($this->configuration->getPhpErrors() == true)
+        {   // Enable PHP error reporting
+            ini_set("display_errors", 1);
+            ini_set("display_startup_errors", 1);
+            error_reporting(E_ALL);
+        }
+
+    }
+
+    /**
+     * Runs application.
+     * @param Request $request Request which should be handled by application.
+     */
+    public function run(Request $request): void
+    {
+        Application::logger()->low("Incoming request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): " . $request->getResource());
+        $route = $this->router->route($request->getResource());
+        if ($route != null)
+        {
+            $controller = $route->getController();
+            Application::logger()->base("Route found: giving control to '" . $controller::class . "'.");
+            $response = null;
+            switch($request->getMethod())
+            {
+                case HttpMethod::GET:    $response = $controller->get($request); break;
+                case HttpMethod::POST:   $response = $controller->post($request); break;
+                case HttpMethod::PUT:    $response = $controller->put($request); break;
+                case HttpMethod::DELETE: $response = $controller->delete($request); break;
+            }
+            
+        }
+        else
+        {
+            Application::logger()->warning("Request cannot be handled: no route defined for '" . $request->getResource() . "'!");
+        }
     }
 
     /**
@@ -54,6 +132,24 @@ class Application
     public static function logger(): Logger
     {
         return Application::$logger;
+    }
+
+    /**
+     * Loads source code.
+     * @param string $className Fully qualified name of class.
+     */
+    public static function loadSource(string $className): void
+    {
+        Application::$sourceLoader->includeSource($className);
+    }
+
+    /**
+     * Gets loader of external sources.
+     * @return SourceLoader Loader of external sources.
+     */
+    public function getSourceLoader(): SourceLoader
+    {
+        return Application::$sourceLoader;
     }
 }
 

@@ -17,40 +17,26 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-namespace PHPMovic;
+namespace PHPMovic\Utils\Event;
+
+use PHPMovic\Utils\Event\EventHandler;
 
 /**
- * Main class of whole application.
+ * Interface abstracting all sources of various events.
  */
-class Main
+interface EventSource
 {
     /**
-     * Main function of whole application.
-     * This function will be run at start of application.
+     * Registers an event handler.
+     * @param EventHandler $handler Handler to be registered.
      */
-    public static function main(): void
-    {
-        // Define configuration file.
-        $file = $_SERVER["DOCUMENT_ROOT"] . "/CONFIG.YAML";
+    public function registerHandler(EventHandler $handler): void;
 
-        // Include bootloader.
-        require_once($_SERVER['DOCUMENT_ROOT'] . "/CORE/BOOTLOADER.PHP");
-
-        // Create bootloader.
-        $bootloader = new \PHPMovic\Bootloader($file);
-
-        // Initialize application.
-        // (from this point, there is no need for including files directly,
-        //  because bootloader enables files auto-loading)
-        $application = $bootloader->load();
-
-        // Create request.
-        $request = new \PHPMovic\Model\Server\Request();
-
-        // Handle request.
-        $application->run($request);
-    }
+    /**
+     * Unregisters an event handler.
+     * @param EventHandler $handler Handler to be unregistered.
+     */
+    public function unregisterHandler(EventHandler $handler): void;
 }
 
 ?>
-

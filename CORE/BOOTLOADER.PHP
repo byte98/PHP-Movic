@@ -19,8 +19,9 @@
 
 namespace PHPMovic;
 
-
+require_once($_SERVER["DOCUMENT_ROOT"] . "/CORE/BASELOADER.PHP");
 use PHPMovic\Application;
+use PHPMovic\BaseLoader;
 use PHPMovic\Model\Configuration\Configuration;
 use PHPMovic\Model\Configuration\ConfigurationLoader;
 
@@ -39,12 +40,22 @@ class Bootloader
      */
     private Configuration $configuration;
 
+    /**
+     * Basic loader of classes.
+     */
+    private readonly BaseLoader $loader;
+
+    /**
+     * Application loaded by this loader.
+     */
+    private ?Application $application = null;
 
     /**
      * Creates new initial loader.
      */
     public function __construct(string $configFile)
     {
+        $this->loader = new BaseLoader();
         $this->configFile = $configFile;
     }
 
@@ -55,8 +66,12 @@ class Bootloader
     public function load(): Application
     {
         $this->enableAutoLoad();
+        $this->defineStdout();
         $this->loadCongfiugration();
-        return new Application($this->configuration);
+        $this->setTimezone();
+        $this->startSession();
+        $this->application = new Application($this, $this->configuration);
+        return $this->application;
     }
 
     /**
@@ -73,29 +88,45 @@ class Bootloader
      */
     private function enableAutoLoad(): void
     {
-        spl_autoload_register(function($className)
-        {
-            $path = Bootloader::determineClassPath($className);
-            if (file_exists($path))
-            {
-                require_once($path);
-            }
-        });
+        spl_autoload_register($this->loader);
     }
 
     /**
-     * Determines path to file with definition of class from
-     * its name.
-     * @param string $className Fully qualified name of class.
-     * @return string Path to file with definition of class.
+     * Defines standard streams to be used.
      */
-    private static function determineClassPath(string $className): string{
-        $reti = "";
-        $classPath = str_replace('\\', DIRECTORY_SEPARATOR, str_replace("PHPMovic\\", "", $className));
-        $rootPath = $_SERVER["DOCUMENT_ROOT"];
-        $reti = $rootPath . DIRECTORY_SEPARATOR . strtoupper($classPath) . ".PHP";
-        $reti = str_replace("PHP-Movic/", "PHP-Movic/CORE/", $reti);
-        return $reti;
+    private function defineStdout(): void
+    {
+        if(!defined('STDIN'))  define('STDIN',  fopen('php://stdin',  'rb'));
+        if(!defined('STDOUT')) define('STDOUT', fopen('php://stdout', 'wb'));
+        if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
+    }
+
+    /**
+     * Sets default time zone of application.
+     */
+    private function setTimezone(): void
+    {
+        date_default_timezone_set($this->configuration->getTimezone());
+    }
+
+    /**
+     * Starts session of application.
+     */
+    private function startSession(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE)
+        {
+            session_start();
+        }
+    }
+    
+    /**
+     * Gets base loader of classes of application.
+     * @return BaseLoader Base loader of classes of application.
+     */
+    public function getBaseLoader(): BaseLoader
+    {
+        return $this->loader;
     }
 }
 

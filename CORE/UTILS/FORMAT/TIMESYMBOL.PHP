@@ -134,7 +134,7 @@ enum TimeSymbol
             case TimeSymbol::Second:          $reti = strval(intval($dateTime->format("s")));            break;
             case TimeSymbol::ZeroSecond:      $reti = $dateTime->format("s");                            break;   
             case TimeSymbol::Millisecond:     $reti = $dateTime->format("v");                            break;
-            case TimeSymbol::ZeroMillisecond: $reti = StringUtils::ppad($dateTime->format("v"), 4, "0"); break;
+            case TimeSymbol::ZeroMillisecond: $reti = StringUtils::rpad($dateTime->format("v"), 4, "0"); break;
             case TimeSymbol::PeriodLower:     $reti = $dateTime->format("a");                            break;
             case TimeSymbol::PeriodUpper:     $reti = $dateTime->format("A");                            break;
         }

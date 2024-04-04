@@ -40,13 +40,34 @@ class Response
     private array $headers;
 
     /**
-     * Creates new response.
+     * Array with set cookies.
      */
-    public function __construct()
+    private array $cookies;
+
+    /**
+     * Data in actual session.
+     */
+    private array $session;
+
+    /**
+     * Number of response.
+     */
+    private readonly float $number;
+
+    /**
+     * Creates new response.
+     * @param array $cookies Array with set cookies.
+     * @param array $session Data in actual session.
+     * @param float $number Number of response (should be same as number of request).
+     */
+    public function __construct(array $cookies, array $session, float $number)
     {
         $this->views = array();
         $this->responseCode = 200;
         $this->headers = array();
+        $this->cookies = $cookies;
+        $this->session = $session;
+        $this->number = $number;
     }
 
     /**
@@ -54,9 +75,19 @@ class Response
      * @param string $headerName Name of header.
      * @param string $value Value of header.
      */
-    public function setHeader($headerName, $value): void
+    public function setHeader(string $headerName, string $value): void
     {
         $this->headers[$headerName] = $value;
+    }
+
+    /**
+     * Sets value of cookie.
+     * @param string $name Name of cookie.
+     * @param string $value Value of cookie.
+     */
+    public function setCookie(string $name, string $value): void
+    {
+        $this->cookies[$name] = $value;
     }
 
     /**
@@ -64,7 +95,7 @@ class Response
      * @param string $viewName Name of view.
      * @param ViewData $data Data of view.
      */
-    public function addView(string $viewName, ViewData $data = null): void
+    public function addView(string $viewName, ViewData $data = new ViewData()): void
     {
         array_push($this->views, new ViewInsert($viewName, $data));
     }
@@ -103,6 +134,15 @@ class Response
     public function getResponseCode(): int
     {
         return $this->responseCode;
+    }
+
+    /**
+     * Gets number of response.
+     * @return float Number of response.
+     */
+    public function getNumber(): string
+    {
+        return $this->number;
     }
 }
 

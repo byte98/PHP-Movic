@@ -23,37 +23,38 @@ use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\Response;
 
 /**
- * Interface abstracting all controllers of the application.
+ * Class which implements controller interface to be used by
+ * another controllers to implement just required methods.
  */
-interface Controller
+abstract class ControllerAdapter implements Controller
 {
-    /**
-     * Hanldes HTTP GET request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
-     */
-    public function get(Request $request): Response;
+    public function get(Request $request): Response
+    {
+        $reti = $request->createResponse();
+        $reti->setResponseCode(405); // 405 Method Not Allowed
+        return $reti;
+    }
 
-    /**
-     * Hanldes HTTP POST request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
-     */
-    public function post(Request $request): Response;
+    public function post(Request $request): Response
+    {
+        $reti = $request->createResponse();
+        $reti->setResponseCode(405); // 405 Method Not Allowed
+        return $reti;
+    }
 
-    /**
-     * Hanldes HTTP PUT request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
-     */
-    public function put(Request $request): Response;
+    public function put(Request $request): Response
+    {
+        $reti = $request->createResponse();
+        $reti->setResponseCode(405); // 405 Method Not Allowed
+        return $reti;
+    }
 
-    /**
-     * Hanldes HTTP DELETE request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
-     */
-    public function delete(Request $request): Response;
+    public function delete(Request $request): Response
+    {
+        $reti = $request->createResponse();
+        $reti->setResponseCode(405); // 405 Method Not Allowed
+        return $reti;
+    }
 }
 
 ?>

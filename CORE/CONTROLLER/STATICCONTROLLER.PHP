@@ -19,41 +19,34 @@
 
 namespace PHPMovic\Controller;
 
-use PHPMovic\Model\Server\Request;
-use PHPMovic\Model\Server\Response;
+use PHPMovic\Controller\ControllerAdapter;
 
 /**
- * Interface abstracting all controllers of the application.
+ * Class which handles static routes.
  */
-interface Controller
+class StaticController extends ControllerAdapter
 {
     /**
-     * Hanldes HTTP GET request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
+     * Root path to look for files.
      */
-    public function get(Request $request): Response;
+    private readonly string $root;
 
     /**
-     * Hanldes HTTP POST request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
+     * Creates new controller for static routes.
+     * @param string $root Root path to look for files.
      */
-    public function post(Request $request): Response;
+    public function __construct(string $root)
+    {
+        $this->root = $root;
+    }
 
-    /**
-     * Hanldes HTTP PUT request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
-     */
-    public function put(Request $request): Response;
+    public function get(Request $request): Response
+    {
+        var_dump($request->getValue("file"));
+        $reti = $request->createResponse();
 
-    /**
-     * Hanldes HTTP DELETE request.
-     * @param Request $request Request to handle.
-     * @return Response Response to request.
-     */
-    public function delete(Request $request): Response;
+        return $reti;
+    }
 }
 
 ?>

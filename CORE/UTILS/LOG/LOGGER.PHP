@@ -20,6 +20,7 @@
 namespace PHPMovic\Utils\Log;
 
 use PHPMovic\Model\Configuration\LogModel;
+use PHPMovic\Utils\Event\AbstractEventSource;
 use PHPMovic\Utils\Format\DateTimeFormat;
 use PHPMovic\Utils\Log\Log;
 use PHPMovic\Utils\Log\LogLevel;
@@ -27,8 +28,13 @@ use PHPMovic\Utils\Log\LogLevel;
 /**
  * Class which performs logging.
  */
-class Logger
+class Logger extends AbstractEventSource
 {
+    /**
+     * Name of event triggered, when log to console should be performed.
+     */
+    public const EventConsoleLog = "Logger::ConsoleLog.event";
+
     /**
      * Model of logger defining behaviour of logger.
      */
@@ -45,15 +51,22 @@ class Logger
     private bool $dirChecked;
 
     /**
+     * Logs which will be printed to browser console.
+     */
+    private array $consoleLogs;
+
+    /**
      * Creates new logger.
      * @param LogModel $logModel Model of logger.
      * @param DateTimeFormat $dateFormat Date format of logger.
      */
     public function __construct(LogModel $logModel, DateTimeFormat $dateFormat)
     {
+        parent::__construct();
         $this->logModel = $logModel;
         $this->dateFormat = $dateFormat;
         $this->dirChecked = false;
+        $this->consoleLogs = array();
     }
 
     /**
@@ -82,7 +95,7 @@ class Logger
         {
             $reti = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . $reti;
         }
-        $reti .= $date->format("Y-m-d") . ".log";
+        $reti .= DIRECTORY_SEPARATOR . $date->format("Y-m-d") . ".log";
         return $reti;
     }
 
@@ -114,7 +127,7 @@ class Logger
     {
         $this->checkLogDir();
         $path = $this->getFilePath($date);
-        file_put_contents($path, $text, FILE_APPEND);
+        file_put_contents($path, $text . PHP_EOL, FILE_APPEND);
     }
 
     /**
@@ -123,9 +136,36 @@ class Logger
      */
     private function print(string $text): void
     {
-        fwrite(\STDOUT, $text);
+        fwrite(\STDOUT, $text . PHP_EOL);
     }
-    updating
+
+    /**
+     * Prints script tag with log into console.
+     * @param string $level Level of console log.
+     * @param string $text Text of console log.
+     */
+    private function echoConsole(string $level, string $text): void
+    {
+        array_push($this->consoleLogs, "<script>console." . $level . "('" . $text . "');</script>");
+        $this->triggerEvent(Logger::EventConsoleLog);
+    }
+
+    /**
+     * Retrieves script tags which performs logging into
+     * web browser console.
+     * @return array Array of script tags.
+     */
+    public function retrieveConsoleLogs(): array
+    {
+        $reti = array();
+        foreach($this->consoleLogs as $log)
+        {
+            array_push($reti, $log);
+        }
+        $this->consoleLogs = array();
+        return $reti;
+    }
+
     /**
      * Handles log and performs logging.
      * @param Log $log Log to be logged.
@@ -142,6 +182,21 @@ class Logger
                 $consoleText = $this->logModel->getFormat($log->getLevel())->format($log, $this->dateFormat, true);
                 $this->print($consoleText);
             }
+            if ($this->logModel->getConsole())
+            {   
+                $ctext = $this->logModel->getFormat($log->getLevel())->format($log, $this->dateFormat, $useFormat);
+                $lvl = "log";
+                switch ($log->getLevel())
+                {
+                    case LogLevel::Info:     $lvl = "info";    break;
+                    case LogLevel::Success:  $lvl = "info";    break;
+                    case LogLevel::Warning:  $lvl = "warn";    break;
+                    case LogLevel::Error:    $lvl = "error";   break;
+                    case LogLevel::Critical: $lvl = "error";   break;
+                    default:                 $lvl = "log";     break;
+                }
+                $this->echoConsole($lvl, $ctext);
+            }
         }
     }
 
@@ -152,7 +207,7 @@ class Logger
      */
     public function log(LogLevel $level, string $message): void
     {
-        $this->handleLog(new Log($message, $level));
+        $this->handleLog(Log::createNow($message, $level));
     }
 
     /**
@@ -160,7 +215,7 @@ class Logger
      * @param string $message Message of log.
      */
     public function low(string $message): void
-    {updating
+    {
         $this->log(LogLevel::Low, $message);
     }
 

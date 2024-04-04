@@ -20,6 +20,7 @@
 namespace PHPMovic\Utils\Format;
 
 use PHPMovic\Utils\Log\Log;
+use PHPMovic\Utils\Log\LogLevel;
 use PHPMovic\Utils\StringUtils;
 
 
@@ -39,6 +40,11 @@ enum LogDataSymbol
     case Level;
 
     /**
+     * Level padded to length of longest level.
+     */
+    case PaddedLevel;
+
+    /**
      * Mesage of log.
      */
     case Message;
@@ -55,9 +61,10 @@ enum LogDataSymbol
         $input = strtoupper(StringUtils::trim($string));
         switch ($input) 
         {
-            case "DATE":    $reti = LogDataSymbol::Date;    break;
-            case "LEVEL":   $reti = LogDataSymbol::Level;   break;
-            case "MESSAGE": $reti = LogDataSymbol::Message; break;
+            case "DATE":    $reti = LogDataSymbol::Date;        break;
+            case "LEVEL":   $reti = LogDataSymbol::Level;       break;
+            case "PDLVL":   $reti = LogDataSymbol::PaddedLevel; break;
+            case "MESSAGE": $reti = LogDataSymbol::Message;     break;
         }
         return $reti;
     }
@@ -73,9 +80,10 @@ enum LogDataSymbol
         $reti = "";
         switch ($this)
         {
-            case LogDataSymbol::Date:    $reti = $dateFormat->format($log->getDate()); break;
-            case LogDataSymbol::Level:   $reti = $log->getLevel()->toString();         break;
-            case LogDataSymbol::Message: $reti = $log->getMessage();                   break;
+            case LogDataSymbol::Date:        $reti = $dateFormat->format($log->getDate());                                      break;
+            case LogDataSymbol::Level:       $reti = $log->getLevel()->toString();                                              break;
+            case LogDataSymbol::PaddedLevel: $reti = StringUtils::pad($log->getLevel()->toString(), LogLevel::longestString()); break;
+            case LogDataSymbol::Message:     $reti = $log->getMessage();                                                        break;
         }
         return $reti;
     }

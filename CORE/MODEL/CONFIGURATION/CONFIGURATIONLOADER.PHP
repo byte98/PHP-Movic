@@ -27,6 +27,9 @@ use PHPMovic\Utils\Format\LogFormat;
 use PHPMovic\Utils\Log\LogLevel;
 use PHPMovic\Model\Configuration\ConnectionModel;
 use PHPMovic\Model\Configuration\LogModel;
+use PHPMovic\Model\Configuration\SourcesModel;
+use PHPMovic\Model\Configuration\RouterModel;
+use PHPMovic\Main;
 
 /**
  * Class which provides functionality to load configuration.
@@ -63,7 +66,10 @@ class ConfigurationLoader
             $this->getDateTimeFormat($data),
             $this->getPHPErrors($data),
             $this->getConnectionModel($data),
-            $this->getLogModel($data)
+            $this->getLogModel($data),
+            $this->getSourcesModel($data),
+            $this->getRouterModel($data),
+            $this->getTimeZone($data)
         );
     }
 
@@ -95,6 +101,21 @@ class ConfigurationLoader
         {
             $parser = new DateTimeFormatParser($data["DateFormat"]);
             $reti = $parser->getFormat();
+        }
+        return $reti;
+    }
+
+    /**
+     * Gets time zone from configuration.
+     * @param array $data Parsed configuration data.
+     * @return string Time zone from configuration.
+     */
+    private function getTimeZone(array $data): string
+    {
+        $reti = "UTC";
+        if ($this->checkValue($data, "Timezone", "string"))
+        {
+            $reti = $data["Timezone"];
         }
         return $reti;
     }
@@ -136,6 +157,7 @@ class ConfigurationLoader
         $stdout = false;
         $formatString = "";
         $useFormat = false;
+        $console = false;
         if ($this->checkValue($data, "LogLevel", "string"))
         {
             $level = LogLevel::fromStringOrDefined($data["LogLevel"], $level);
@@ -145,6 +167,7 @@ class ConfigurationLoader
         if ($this->checkValue($data, "LogStdout", "boolean")) $stdout = $data["LogStdout"];
         if ($this->checkValue($data, "LogUseFormat", "boolean")) $useFormat = $data["LogUseFormat"];
         if ($this->checkValue($data, "LogFormat", "string")) $formatString = $data["LogFormat"];
+        if ($this->checkValue($data, "LogConsole", "boolean")) $console = $data["LogConsole"];
         
         $lowFormatString = $formatString;
         $baseFormatString = $formatString;
@@ -181,6 +204,7 @@ class ConfigurationLoader
             $path,
             $stdout,
             $useFormat,
+            $console,
             $this->parseLogFormat($formatString),
             $this->parseLogFormat($lowFormatString),
             $this->parseLogFormat($baseFormatString),
@@ -201,6 +225,46 @@ class ConfigurationLoader
     {
         $parser = new LogFormatParser($formatString);
         return $parser->getFormat();
+    }
+
+    /**
+     * Gets model of sources from configuration data.
+     * @param array $data Parsed configuration data.
+     * @return SourcesModel Model of sources from configuration.
+     */
+    private function getSourcesModel(array $config): SourcesModel
+    {
+        $contentNS = "";
+        $mainName = Main::class;
+        $coreNS = substr($mainName, 0, strrpos($mainName, '\\'));
+        if ($this->checkValue($config, "ContentNamespace", "string")) $contentNS = $config["ContentNamespace"];
+        return new SourcesModel($coreNS, $contentNS);
+    }
+
+    /**
+     * Gets model of router from configuration data.
+     * @param array $data Parsed configuration data.
+     * @return RouterModel Model of router from configuration.
+     */
+    private function getRouterModel(array $config): RouterModel
+    {
+        $routes = array();
+        $static = array();
+        if ($this->checkValue($config, "Routes", "array"))
+        {
+            foreach($config["Routes"] as $key => $value)
+            {
+                $routes[$key] = $value;
+            }
+        }
+        if ($this->checkValue($config, "StaticRoutes", "array"))
+        {
+            foreach($config["StaticRoutes"] as $key => $value)
+            {
+                $static[$key] = $value;
+            }
+        }
+        return new RouterModel($routes, $static);
     }
 
     /**

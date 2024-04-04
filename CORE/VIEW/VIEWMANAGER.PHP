@@ -78,7 +78,7 @@ abstract class ViewManager
         $path = ViewManager::getViewPath($name);
         if ($path != null)
         {
-            $_VIEW = $data;
+            $_VIEW = new Printable($data);
             include($path);
         }
     }

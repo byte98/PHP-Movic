@@ -67,6 +67,24 @@ enum HttpMethod
         }
         return $reti;
     }
+
+    /**
+     * Gets string representation of HTTP method.
+     * @return string String representation of HTTP method.
+     */
+    public function toString(): string
+    {
+        $reti = "<UNKNOWN>";
+        switch($this)
+        {
+            case HttpMethod::GET:    $reti = "GET";    break;
+            case HttpMethod::POST:   $reti = "POST";   break;
+            case HttpMethod::PUT:    $reti = "PUT";    break;
+            case HttpMethod::PATCH:  $reti = "PATCH";  break;
+            case HttpMethod::DELETE: $reti = "DELETE"; break;
+        }
+        return $reti;
+    }
 }
 
 ?>

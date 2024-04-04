@@ -22,6 +22,8 @@ namespace PHPMovic\Model\Configuration;
 use PHPMovic\Utils\Format\DateTimeFormat;
 use PHPMovic\Model\Configuration\ConnectionModel;
 use PHPMovic\Model\Configuration\LogModel;
+use PHPMovic\Model\Configuration\SourcesModel;
+use PHPMovic\Model\Configuration\RouterModel;
 
 /**
  * Class which holds whole configuration of the application.
@@ -49,22 +51,47 @@ class Configuration
     private readonly LogModel $logModel;
 
     /**
+     * Model of all sources of application.
+     */
+    private readonly SourcesModel $sourcesModel;
+
+    /**
+     * Model of router of application.
+     */
+    private readonly RouterModel $routes;
+
+
+    /**
+     * Default time zone of application.
+     */
+    private readonly string $timezone;
+
+    /**
      * Creates new configuration of application.
      * @param DateTimeFormat $dateTimeFormat Format of date and time used in application.
      * @param bool $phpErrors Flag, whether PHP errors should be displayed or not.
      * @param ConnectionModel $connectionModel Model of connection to database.
      * @param LogModel $logModel Model of logs and logger.
+     * @param SourcesModel $sourcesModel Model of all sources of application.
+     * @param RouterModel $routes Model of router of application.
+     * @param string $timezone Default time zone of application.
      */
     public function __construct(
         DateTimeFormat $dateTimeFormat,
         bool $phpErrors,
         ConnectionModel $connectionModel,
-        LogModel $logModel)
+        LogModel $logModel,
+        SourcesModel $sourcesModel,
+        RouterModel $routes,
+        string $timezone)
     {
         $this->dateTimeFormat = $dateTimeFormat;
         $this->phpErrors = $phpErrors;
         $this->connectionModel = $connectionModel;
         $this->logModel = $logModel;
+        $this->sourcesModel = $sourcesModel;
+        $this->routes = $routes;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -101,6 +128,34 @@ class Configuration
     public function getLogModel(): LogModel
     {
         return $this->logModel;
+    }
+
+    /**
+     * Gets model of all sources of application.
+     * @return SourcesModel Model of all sources of application.
+     */
+    public function getSourcesModel(): SourcesModel
+    {
+        return $this->sourcesModel;
+    }
+
+    /**
+     * Gets model of router of application.
+     * @return RouterModel Router model.
+     */
+    public function getRoutes(): RouterModel
+    {
+        return $this->routes;
+    }
+
+    /**
+     * Gets default time zone of application.
+     * @return string Default time zone of application.
+     * @see https://www.php.net/manual/en/timezones.php
+     */
+    public function getTimezone(): string
+    {
+        return $this->timezone;
     }
 }
 

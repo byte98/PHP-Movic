@@ -54,6 +54,11 @@ class LogModel
     private readonly bool $stdout;
 
     /**
+     * Flag, whether logs should be also printed to broweser console.
+     */
+    private readonly bool $console;
+
+    /**
      * Flag, whether styling should be used also for
      * logs saved into file.
      */
@@ -67,6 +72,7 @@ class LogModel
      * @param bool $stdout Flag, whether logs should be also printed to standard output.
      * @param bool $fileUseFormat Flag, whether styling should be used also for
      *                            logs saved into file.
+     * @param bool $console Flag, whether logs should be also printed to browser console.
      * @param LogFormat $format Format of logs.
      * @param LogFormat $formatLow Format of logs at level Low.
      * @param LogFormat $formatBase Format of logs at level Base.
@@ -82,6 +88,7 @@ class LogModel
         string $path,
         bool $stdout,
         bool $fileUseFormat,
+        bool $console,
         LogFormat $format,
         ?LogFormat $formatLow = null,
         ?LogFormat $formatBase = null,
@@ -112,6 +119,7 @@ class LogModel
         $this->path = $path;
         $this->stdout = $stdout;
         $this->fileUseFormat = $fileUseFormat;
+        $this->console = $console;
     }
 
     /**
@@ -169,6 +177,15 @@ class LogModel
     public function getFormat(LogLevel $level): LogFormat
     {
         return $this->formats[$level->toString()];
+    }
+
+    /**
+     * Gets flag, whether logs should be also printed to browser console.
+     * @return bool Flag, whether logs should be also printed to browser console.
+     */
+    public function getConsole(): bool
+    {
+        return $this->console;
     }
 }
 

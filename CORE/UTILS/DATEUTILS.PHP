@@ -17,40 +17,37 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-namespace PHPMovic;
+namespace PHPMovic\Utils;
+
+use DateTime;
+use DateTimeZone;
 
 /**
- * Main class of whole application.
+ * Class which contains some utility functions
+ * to work with dates.
  */
-class Main
+abstract class DateUtils
 {
     /**
-     * Main function of whole application.
-     * This function will be run at start of application.
+     * Gets default time zone for whole application.
+     * @return DateTimeZone Default time zone for whole application.
      */
-    public static function main(): void
+    public static function getDefaultTimezone(): DateTimeZone
     {
-        // Define configuration file.
-        $file = $_SERVER["DOCUMENT_ROOT"] . "/CONFIG.YAML";
+        $tz = date_default_timezone_get();
+        $reti = new DateTimeZone($tz);
+        return $reti;
+    }
 
-        // Include bootloader.
-        require_once($_SERVER['DOCUMENT_ROOT'] . "/CORE/BOOTLOADER.PHP");
-
-        // Create bootloader.
-        $bootloader = new \PHPMovic\Bootloader($file);
-
-        // Initialize application.
-        // (from this point, there is no need for including files directly,
-        //  because bootloader enables files auto-loading)
-        $application = $bootloader->load();
-
-        // Create request.
-        $request = new \PHPMovic\Model\Server\Request();
-
-        // Handle request.
-        $application->run($request);
+    /**
+     * Gets actual date and time.
+     * @return DateTime Actual date and time.
+     */
+    public static function now(): DateTime
+    {
+        $reti = new DateTime('now', DateUtils::getDefaultTimezone());
+        return $reti;
     }
 }
 
 ?>
-

@@ -103,6 +103,14 @@ class LogFormat
             {
                 $reti .= $symbol->toString();
             }
+            else if (gettype($symbol) == "string")
+            {
+                $reti .= $symbol;
+            }
+            else if ($symbol instanceof StyleSymbol == false && $symbol instanceof ColorSetter == false && $symbol instanceof LogDataSymbol == false)
+            {
+                $reti .= var_export($symbol, true);
+            }
         }
         return $reti;
     }
