@@ -73,7 +73,7 @@ abstract class DateUtils
             $elapsed .= $interval->s . ' second' . ($interval->s > 1 ? 's ' : ' ');
         }
         if ($interval->f > 0) {
-            $elapsed .= $interval->f . ' millisecond';
+            $elapsed .= ($interval->f * 1000) . ' millisecond';
         }
 
         // Trim any extra space at the end

@@ -103,6 +103,11 @@ LogLevelFormat:
 # Note: this setting is also affected by LogUseFormat.
 LogConsole: True
 
+# Name of class which provides connection to the database. This is
+# expected to be any class, which has source code within /DRIVERS
+# folder.
+DatabaseDriver: "PHPMovicMySQLDriver"
+
 # Name or address of the database server.
 DatabaseHost: "localhost"
 

@@ -44,6 +44,11 @@ class ConnectionModel
      * Password of user with access to the database.
      */
     private readonly string $password;
+
+    /**
+     * Name of class which provides connection to the database.
+     */
+    private readonly string $driver;
     
 
     /**
@@ -52,13 +57,15 @@ class ConnectionModel
      * @param string $database Name of database used by application.
      * @param string $username Name of user with access to the database.
      * @param string $password Password of user with access to the database.
+     * @param string $driver Name of class which provides connection to the database.
      */
-    public function __construct(string $hostname, string $database, string $username, string $password)
+    public function __construct(string $hostname, string $database, string $username, string $password, string $driver)
     {
         $this->hostname = $hostname;
         $this->database = $database;
         $this->username = $username;
         $this->password = $password;        
+        $this->driver = $driver;
     }
 
     /**
@@ -95,6 +102,15 @@ class ConnectionModel
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    /**
+     * Gets name of class which provides connection to the database.
+     * @return string Name of class which provides connection to the database.
+     */
+    public function getDriver(): string
+    {
+        return $this->driver;
     }
 }
 

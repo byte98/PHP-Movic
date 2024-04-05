@@ -110,6 +110,10 @@ class SourceLoader
             // It could be a driver
             $prefix .= "DRIVERS";
             $filePart = $className;
+            if (str_starts_with($filePart, "\\") == false)
+            {
+                $filePart = "\\" . $filePart;
+            }
             $reti = $this->getFilePath($prefix, $filePart);
             if (file_exists($reti) == false)
             {

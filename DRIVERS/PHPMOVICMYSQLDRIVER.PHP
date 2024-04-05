@@ -21,14 +21,13 @@ use PHPMovic\Model\Configuration\ConnectionModel;
 use PHPMovic\Model\Database\Driver;
 use PHPMovic\Model\Database\QueryInfo;
 use PHPMovic\Model\Database\QueryResult;
-use \mysqli as mysqli;
 
 class PHPMovicMySQLDriver implements Driver
 {
     /**
      * Connection to the database.
      */
-    private ?mysqli $connection = null;
+    private ?\mysqli $connection = null;
 
     public function query(string $query): QueryResult
     {
@@ -66,16 +65,29 @@ class PHPMovicMySQLDriver implements Driver
         {
             $this->connection->close();
         }
-        $this->connection = new mysqli(
-            $connection->getHostname(),
-            $connection->getUsername(),
-            $connection->getPassword(),
-            $connection->getDatabase()
-        );
-        if ($this->connection == false)
+        try
+        {
+            $this->connection = new mysqli(
+                $connection->getHostname(),
+                $connection->getUsername(),
+                $connection->getPassword(),
+                $connection->getDatabase()
+            );
+        }
+        catch(mysqli_sql_exception $ex)
+        {
+            Application::logger()->warning("Cannot connect to database: " . $ex->getMessage());
+            $reti = false;
+            $this->connection = null;
+        }
+        if ($this->connection === false)
         {
             $reti = false;
-            $this->connection = false;
+            $this->connection = null;
+        }
+        else
+        {
+            $reti = true;
         }
         return $reti;
     }
@@ -86,6 +98,7 @@ class PHPMovicMySQLDriver implements Driver
         if ($this->connection != null)
         {
             $reti = $this->connection->close();
+            $this->connection = null;
         }
         return $reti;
     }

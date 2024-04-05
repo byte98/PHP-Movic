@@ -57,6 +57,10 @@ class SourcesModel
     private function isInNamespace(string $className, string $namespace): bool
     {
         $reti = false;
+        if (str_ends_with($namespace, "\\") == false)
+        {
+            $namespace .= "\\";
+        }
         $str1 = strtoupper(StringUtils::trim($className));
         $str2 = strtoupper(StringUtils::trim($namespace));
         if (substr($str1, 0, strlen($str2)) == $str2)

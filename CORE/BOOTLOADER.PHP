@@ -18,6 +18,7 @@
 // 
 
 namespace PHPMovic;
+use PHPMovic\Utils\DateUtils;
 
 require_once($_SERVER["DOCUMENT_ROOT"] . "/CORE/BASELOADER.PHP");
 use PHPMovic\Application;
@@ -50,6 +51,12 @@ class Bootloader
      */
     private ?Application $application = null;
 
+
+    /**
+     * Date and time of application start.
+     */
+    private \DateTime $start;
+
     /**
      * Creates new initial loader.
      */
@@ -57,6 +64,8 @@ class Bootloader
     {
         $this->loader = new BaseLoader();
         $this->configFile = $configFile;
+        $this->enableAutoLoad();
+        $this->start = DateUtils::now();
     }
 
     /**
@@ -65,7 +74,6 @@ class Bootloader
      */
     public function load(): Application
     {
-        $this->enableAutoLoad();
         $this->defineStdout();
         $this->loadCongfiugration();
         $this->setTimezone();
@@ -73,6 +81,15 @@ class Bootloader
         $this->application = new Application($this, $this->configuration);
         Application::logger()->debug("Bootloader finished");
         return $this->application;
+    }
+
+    /**
+     * Gets date and time of application start.
+     * @return \DateTime Date and time of application start.
+     */
+    public function getStart(): \DateTime
+    {
+        return $this->start;
     }
 
     /**

@@ -133,16 +133,19 @@ class ConfigurationLoader
         $database = "";
         $username = "";
         $password = "";
+        $driver = "";
         if ($this->checkValue($data, "DatabaseHost", "string")) $hostname = $data["DatabaseHost"];
         if ($this->checkValue($data, "DatabaseName", "string")) $database = $data["DatabaseName"];
         if ($this->checkValue($data, "DatabaseUser", "string")) $username = $data["DatabaseUser"];
         if ($this->checkValue($data, "DatabasePassword", "string")) $password = $data["DatabasePassword"];
+        if ($this->checkValue($data, "DatabaseDriver", "string")) $driver = $data["DatabaseDriver"];
 
         return new ConnectionModel(
             $hostname,
             $database,
             $username,
-            $password
+            $password,
+            $driver
         );
     }
 

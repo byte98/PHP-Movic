@@ -20,6 +20,8 @@
 namespace PHPMovic;
 
 use PHPMovic\Model\Configuration\Configuration;
+use PHPMovic\Model\Database\DatabaseManager;
+use PHPMovic\Model\Database\Driver;
 use PHPMovic\Model\Server\Responder;
 use PHPMovic\Router\Router;
 use PHPMovic\Utils\Log\Logger;
@@ -29,8 +31,8 @@ use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\HttpMethod;
 use PHPMovic\Utils\Counter\CountersManager;
 use PHPMovic\Utils\StringUtils;
+use PHPMovic\Utils\DateUtils;
 use PHPMovic\View\SimpleView;
-use PHPMovicMySQLDriver;
 
 /**
  * Class which represents whole application.
@@ -73,6 +75,11 @@ class Application
     private static ?CountersManager $countersManager = null;
 
     /**
+     * Manager of connections to the database.
+     */
+    private static ?DatabaseManager $databaseManager = null;
+
+    /**
      * Creates new instance of application.
      * @param Bootloader $bootloader Bootloader of whole application.
      * @param Configuration $configuration Configuration of application.
@@ -87,6 +94,7 @@ class Application
         $this->changeAutoloader();
         $this->router = new Router($this->configuration);
         $this->responder = new Responder();
+        Application::$databaseManager = new DatabaseManager($this->configuration->getConnectionModel());
         $this->init();
     }
 
@@ -117,7 +125,7 @@ class Application
 
         // Set namespace for views
         SimpleView::setRoot($this->configuration->getSourcesModel()->getUserNamespace());
-
+        Application::logger()->low("Application loaded in " . DateUtils::elapsed($this->bootloader->getStart(), DateUtils::now())); 
     }
 
     /**
@@ -135,6 +143,7 @@ class Application
             $controller = $route->getController();
             Application::logger()->low("Route found: giving control to '" . $controller::class . "'.");
             $response = null;
+            $start = DateUtils::now();
             switch($request->getMethod())
             {
                 case HttpMethod::GET:    $response = $controller->get($request); break;
@@ -144,6 +153,7 @@ class Application
             }
             if ($response != null)
             {
+                Application::logger()->low("Controller '" . $controller::class . "' finished its job in " . DateUtils::elapsed($start, DateUtils::now()) . " (response #" . $response->getNumber() . " to " . $response->getAddress() . ").");
                 $this->responder->respond($response);
             }
             else
@@ -155,6 +165,9 @@ class Application
         {
             Application::logger()->warning("Request cannot be handled: no route defined for '" . $request->getResource() . "'!");
         }
+        Application::db()->close();
+        Application::$databaseManager->closeAll();
+        Application::logger()->low("Application finished in " . DateUtils::elapsed($this->bootloader->getStart(), DateUtils::now()));
     }
 
     /**
@@ -191,6 +204,16 @@ class Application
     public static function counters(): CountersManager
     {
         return Application::$countersManager;
+    }
+
+    /**
+     * Gets connection to the database.
+     * @return Driver Driver which provides connection to the database.
+     */
+    public static function db(): Driver
+    {
+        $reti = Application::$databaseManager->get();
+        return $reti;
     }
 }
 
