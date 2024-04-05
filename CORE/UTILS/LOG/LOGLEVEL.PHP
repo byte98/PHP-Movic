@@ -30,6 +30,11 @@ enum LogLevel
 {
 
     /**
+     * Log with some debugging information.
+     */
+    case Debug;
+
+    /**
      * Lowest level of log.
      */
     case Low;
@@ -74,6 +79,7 @@ enum LogLevel
 
         switch($this)
         {
+            case LogLevel::Debug:    $reti = 0;  break;
             case LogLevel::Low:      $reti = 1;  break;
             case LogLevel::Base:     $reti = 2;  break;
             case LogLevel::Info:     $reti = 4;  break;
@@ -96,6 +102,7 @@ enum LogLevel
 
         switch($this)
         {
+            case LogLevel::Debug:    $reti = "DEBUG";    break;
             case LogLevel::Low:      $reti = "LOW";      break;
             case LogLevel::Base:     $reti = "BASE";     break;
             case LogLevel::Info:     $reti = "INFO";     break;
@@ -120,6 +127,7 @@ enum LogLevel
         $input = strtoupper(StringUtils::trim($level));
         switch($input)
         {
+            case "DEBUG":    $reti = LogLevel::Debug;     break;
             case "LOW":      $reti = LogLevel::Low;       break;
             case "BASE":     $reti = LogLevel::Base;      break;
             case "INFO":     $reti = LogLevel::Info;      break;

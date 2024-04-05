@@ -20,6 +20,7 @@
 namespace PHPMovic\Router;
 
 use PHPMovic\Application;
+use PHPMovic\Controller\StaticController;
 use PHPMovic\Router\Route;
 use PHPMovic\Model\Configuration\Configuration;
 
@@ -47,7 +48,11 @@ class Router
     {
         $this->configuration = $configuration;
         $this->routes = array();
+        $counter = Application::counters()->create("ROUTES");
+        $counter->reset();
         $this->buildRoutingTable();
+        $this->buildStaticRoutes();
+        Application::logger()->info("Routing table contains " . count($this->routes) . " routes.");
     }
 
     /**
@@ -58,13 +63,75 @@ class Router
         foreach ($this->configuration->getRoutes()->getRoutes() as $key => $value)
         {
             $controller = $this->configuration->getSourcesModel()->getUserNamespace() . "\\Controller\\" . $value;
-            $route = Route::create($key, $controller);
-            if ($route != null)
+            Application::logger()->debug("Creating route: '" . $key . "' -> '" . $controller . "'");
+            if ($this->tableContains($key))
             {
-                array_push($this->routes, $route);
+                Application::logger()->info("Route for path '" . $key . "' already exists. Skipping.");
+            }
+            else
+            {
+                $route = Route::create($key, $controller);
+                if ($route != null)
+                {
+                    array_push($this->routes, $route);
+                }
             }
         }
-        Application::logger()->info("Routing table contains " . count($this->routes) . " routes.");
+    }
+
+    /**
+     * Builds static routes from configuration.
+     */
+    private function buildStaticRoutes(): void
+    {
+        foreach($this->configuration->getRoutes()->getStaticRoutes() as $key => $value)
+        {
+            Application::logger()->debug("Creating static route: '" . $key . "' -> '" . $value . "'");
+            if ($this->tableContains($key))
+            {
+                Application::logger()->info("Route for path '" . $key . "' already exists. Skipping.");
+            }
+            else
+            {
+                $path = $key;
+                if (str_ends_with($path, "/") == false)
+                {
+                    $path = $path . "/";
+                }
+                $path .= "%FILE::TEXT%";
+                if (str_starts_with($value, DIRECTORY_SEPARATOR) == false)
+                {
+                    $value = DIRECTORY_SEPARATOR . $value;
+                }
+                $filePath = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "CONTENT"  . $value;
+                $route = Route::createFromController($path, new StaticController($filePath));
+                if ($route != null)
+                {
+                    array_push($this->routes, $route);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks, whether there is already route in routing table
+     * for given path.
+     * @param string $path Path to check.
+     * @return bool TRUE if route already exists,
+     *              FALSE otherwise.
+     */
+    private function tableContains(string $path): bool
+    {
+        $reti = false;
+        foreach($this->routes as $route)
+        {
+            if ($route->matchesString($path))
+            {
+                $reti = true;
+                break;
+            }
+        }
+        return $reti;
     }
 
     /**
@@ -85,7 +152,16 @@ class Router
                 {
                     $reti = $route;
                     $retiLen = $route->getLength();
+                    Application::logger()->debug("ROUTER:: route(#" . $route->getNumber() . ") with controller '" . $route->getController()::class . "' matches path " . $path . " and is current candidate.");
                 }
+                else
+                {
+                    Application::logger()->debug("ROUTER:: route(#" . $route->getNumber() . ") with controller '" . $route->getController()::class . "' matches path " . $path);
+                }
+            }
+            else
+            {
+                Application::logger()->debug("ROUTER:: route(#" . $route->getNumber() . ") with controller '" . $route->getController()::class . "' does not match path " . $path);
             }
         }
         return $reti;

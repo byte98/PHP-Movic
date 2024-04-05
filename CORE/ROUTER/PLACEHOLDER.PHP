@@ -57,14 +57,18 @@ class Placeholder
     public static function fromString(string $str): ?Placeholder
     {
         $reti = null;
-        $parts = explode("::", $str);
-        if (count($parts) == 2)
+        if (str_starts_with($str, "%") && str_ends_with($str, "%") && substr_count($str, "%") == 2)
         {
-            $name = $parts[0];
-            $type = PlaceholderType::fromString($parts[1]);    
-            if ($type != null)
+            $input = str_replace("%", "", $str);
+            $parts = explode("::", $input);
+            if (count($parts) == 2)
             {
-                $reti = new Placeholder($type, $name);
+                $name = $parts[0];
+                $type = PlaceholderType::fromString($parts[1]);    
+                if ($type != null)
+                {
+                    $reti = new Placeholder($type, $name);
+                }
             }
         }
         return $reti;

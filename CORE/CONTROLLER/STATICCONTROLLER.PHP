@@ -19,7 +19,14 @@
 
 namespace PHPMovic\Controller;
 
+use PHPMovic\Application;
 use PHPMovic\Controller\ControllerAdapter;
+use PHPMovic\Model\Server\Request;
+use PHPMovic\Model\Server\Response;
+use PHPMovic\Controller\Controller;
+use PHPMovic\Model\Server\HttpStatus;
+use PHPMovic\Utils\PathUtils;
+use PHPMovic\View\FileView;
 
 /**
  * Class which handles static routes.
@@ -37,14 +44,34 @@ class StaticController extends ControllerAdapter
      */
     public function __construct(string $root)
     {
+        if (str_ends_with($root, DIRECTORY_SEPARATOR) == false)
+        {
+            $root = $root . DIRECTORY_SEPARATOR;
+        }
         $this->root = $root;
     }
 
     public function get(Request $request): Response
     {
-        var_dump($request->getValue("file"));
         $reti = $request->createResponse();
-
+        $file = $request->getValue("FILE");
+        if ($file != null)
+        {
+            $path = $this->root . $file;
+            if (file_exists($path))
+            {
+                $reti->addView(new FileView($path));
+            }
+            else
+            {
+                Application::logger()->warning("Requested file '" . $path . "' not found!");
+                $reti->setResponseCode(HttpStatus::NotFound); // 404 Not Found
+            }
+        }
+        else
+        {
+            $reti->setResponseCode(HttpStatus::BadRequest); // 400 Bad Request
+        }
         return $reti;
     }
 }

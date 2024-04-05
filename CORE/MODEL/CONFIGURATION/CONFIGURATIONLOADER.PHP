@@ -29,6 +29,7 @@ use PHPMovic\Model\Configuration\ConnectionModel;
 use PHPMovic\Model\Configuration\LogModel;
 use PHPMovic\Model\Configuration\SourcesModel;
 use PHPMovic\Model\Configuration\RouterModel;
+use PHPMovic\Model\Configuration\CountersModel;
 use PHPMovic\Main;
 
 /**
@@ -69,7 +70,8 @@ class ConfigurationLoader
             $this->getLogModel($data),
             $this->getSourcesModel($data),
             $this->getRouterModel($data),
-            $this->getTimeZone($data)
+            $this->getTimeZone($data),
+            $this->getCountersModel($data)
         );
     }
 
@@ -169,6 +171,7 @@ class ConfigurationLoader
         if ($this->checkValue($data, "LogFormat", "string")) $formatString = $data["LogFormat"];
         if ($this->checkValue($data, "LogConsole", "boolean")) $console = $data["LogConsole"];
         
+        $debugFormatString = $formatString;
         $lowFormatString = $formatString;
         $baseFormatString = $formatString;
         $infoFormatString = $formatString;
@@ -186,6 +189,7 @@ class ConfigurationLoader
                 {
                     switch($formatLevel)
                     {
+                        case LogLevel::Debug: $debugFormatString = $value; break;
                         case LogLevel::Low: $lowFormatString = $value; break;
                         case LogLevel::Base: $baseFormatString = $value; break;
                         case LogLevel::Info: $infoFormatString = $value; break;
@@ -206,6 +210,7 @@ class ConfigurationLoader
             $useFormat,
             $console,
             $this->parseLogFormat($formatString),
+            $this->parseLogFormat($debugFormatString),
             $this->parseLogFormat($lowFormatString),
             $this->parseLogFormat($baseFormatString),
             $this->parseLogFormat($successFormatString),
@@ -265,6 +270,18 @@ class ConfigurationLoader
             }
         }
         return new RouterModel($routes, $static);
+    }
+
+    /**
+     * Gets model of counters from parsed configuration data.
+     * @param array $data Parsed configuration data.
+     * @return CountersModel Model of counters from configuration.
+     */
+    public function getCountersModel(array $config): CountersModel
+    {
+        $file = "";
+        if ($this->checkValue($config, "Counters", "string")) $file = $config["Counters"];
+        return new CountersModel($file);
     }
 
     /**

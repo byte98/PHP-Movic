@@ -55,14 +55,17 @@ class RoutePath
         $explode = explode("/", $this->pathString);
         foreach ($explode as $part)
         {
-            $placeholder = Placeholder::fromString($part);
-            if ($placeholder != null)
+            if (strlen($part) > 0)
             {
-                array_push($this->parts, $placeholder);
-            }
-            else
-            {
-                array_push($this->parts, $part);
+                $placeholder = Placeholder::fromString($part);
+                if ($placeholder != null)
+                {
+                    array_push($this->parts, $placeholder);
+                }
+                else
+                {
+                    array_push($this->parts, $part);
+                }
             }
         }
     }
@@ -83,21 +86,30 @@ class RoutePath
      */
     public function matches(string $request): bool
     {
-        $reti = true;
+        $reti = false;
         $explode = explode("/", $request);
-        if (count($this->parts) == count($explode))
+        $filtered = array();
+        foreach($explode as $part)
         {
+            if (strlen($part) > 0)
+            {
+                array_push($filtered, $part);
+            }
+        }
+        if (count($this->parts) == count($filtered))
+        {
+            $reti = true;
             for ($i = 0; $i < count($this->parts); $i++)
             {
                 if ($this->parts[$i] instanceof Placeholder)
                 {
-                    if ($this->parts[$i]->matches($explode[$i]) == false)
+                    if ($this->parts[$i]->matches($filtered[$i]) == false)
                     {
                         $reti = false;
                         break;
                     }
                 }
-                else if ($this->parts[$i] != $explode[$i])
+                else if ($this->parts[$i] != $filtered[$i])
                 {
                     $reti = false;
                     break;
@@ -116,13 +128,21 @@ class RoutePath
     {
         $reti = array();
         $explode = explode("/", $request);
-        if (count($this->parts) == count($explode))
+        $filtered = array();
+        foreach($explode as $part)
+        {
+            if (strlen($part) > 0)
+            {
+                array_push($filtered, $part);
+            }
+        }
+        if (count($this->parts) == count($filtered))
         {
             for ($i = 0; $i < count($this->parts); $i++)
             {
                 if ($this->parts[$i] instanceof Placeholder)
                 {
-                    $val = $this->parts[$i]->getValue($explode[$i]);
+                    $val = $this->parts[$i]->getValue($filtered[$i]);
                     if ($val !== null)
                     {
                         $reti[$this->parts[$i]->getName()] = $val;
@@ -131,6 +151,18 @@ class RoutePath
             }
         }
         return $reti;
+    }
+
+    /**
+     * Checks, whether given string matches path of route exactly 
+     * (ignoring parsing of placeholders).
+     * @param string $path String to check.
+     * @return bool TRUE if string matches path of route exactly,
+     *              FALSE otherwise.
+     */
+    public function matchesString(string $path): bool
+    {
+        return $this->pathString == $path;
     }
 
 }

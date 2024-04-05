@@ -20,12 +20,14 @@
 namespace PHPMovic;
 
 use PHPMovic\Model\Configuration\Configuration;
+use PHPMovic\Model\Server\Responder;
 use PHPMovic\Router\Router;
 use PHPMovic\Utils\Log\Logger;
 use PHPMovic\SourceLoader;
 use PHPMovic\Bootloader;
 use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\HttpMethod;
+use PHPMovic\Utils\Counter\CountersManager;
 use PHPMovic\Utils\StringUtils;
 
 /**
@@ -59,6 +61,16 @@ class Application
     private readonly Router $router;
 
     /**
+     * Responder to the requests.
+     */
+    private readonly Responder $responder;
+
+    /**
+     * Manager of counters.
+     */
+    private static ?CountersManager $countersManager = null;
+
+    /**
      * Creates new instance of application.
      * @param Bootloader $bootloader Bootloader of whole application.
      * @param Configuration $configuration Configuration of application.
@@ -67,10 +79,12 @@ class Application
     {
         $this->bootloader = $bootloader;
         $this->configuration = $configuration;
+        Application::$countersManager = new CountersManager($this->configuration->getCountersModel());
         Application::$logger = new Logger($configuration->getLogModel(), $configuration->getDateTimeFormat());
         Application::$sourceLoader = new SourceLoader($configuration->getSourcesModel());
         $this->changeAutoloader();
         $this->router = new Router($this->configuration);
+        $this->responder = new Responder();
         $this->init();
     }
 
@@ -95,6 +109,10 @@ class Application
             error_reporting(E_ALL);
         }
 
+        // Reset requests counter
+        //$counter = Application::counters()->create("REQUESTS");
+        //$counter->reset();
+
     }
 
     /**
@@ -103,12 +121,14 @@ class Application
      */
     public function run(Request $request): void
     {
-        Application::logger()->low("Incoming request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): " . $request->getResource());
+        Application::logger()->base("Incoming request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): " . $request->getResource());
         $route = $this->router->route($request->getResource());
         if ($route != null)
         {
+            $data = $route->getData($request->getResource());
+            $request->addData($data);
             $controller = $route->getController();
-            Application::logger()->base("Route found: giving control to '" . $controller::class . "'.");
+            Application::logger()->low("Route found: giving control to '" . $controller::class . "'.");
             $response = null;
             switch($request->getMethod())
             {
@@ -117,7 +137,14 @@ class Application
                 case HttpMethod::PUT:    $response = $controller->put($request); break;
                 case HttpMethod::DELETE: $response = $controller->delete($request); break;
             }
-            
+            if ($response != null)
+            {
+                $this->responder->respond($response);
+            }
+            else
+            {
+                Application::logger()->error("Cannot respond to request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): response from controller is NULL!");
+            }
         }
         else
         {
@@ -150,6 +177,15 @@ class Application
     public function getSourceLoader(): SourceLoader
     {
         return Application::$sourceLoader;
+    }
+
+    /**
+     * Gets manager of counters of application.
+     * @return CountersManager Manager of counters of application.
+     */
+    public static function counters(): CountersManager
+    {
+        return Application::$countersManager;
     }
 }
 

@@ -17,28 +17,20 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-// This file contains demonstration of basic functionality
-// of PHP-Movic. It is not intended to be used in production.
-// For more information, please see project wikipedia at
-// https://github.com/byte98/PHP-Movic/wiki
+namespace PHPMovic\View;
 
-namespace MyApp\Controller;
+use PHPmovic\View\Printable;
 
-use PHPMovic\Controller\ControllerAdapter;
-use PHPmovic\Model\Server\Request;
-use PHPmovic\Model\Server\Response;
-use PHPmovic\Controller\Controller;
-
-class HomePageController extends ControllerAdapter
+/**
+ * Interface which abstracts all views of application.
+ */
+interface View
 {
-
-    public function get(Request $request): Response
-    {
-        $reti = $request->createResponse();
-        
-        return $reti;
-    }
-
+    /**
+     * Renders view.
+     * @param Printable $data Data to be printed.
+     */
+    public function render(Printable $data);
 }
 
 ?>

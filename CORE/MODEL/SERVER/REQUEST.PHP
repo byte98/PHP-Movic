@@ -21,17 +21,13 @@ namespace PHPMovic\Model\Server;
 
 use PHPMovic\Application;
 use PHPMovic\Model\Server\HttpMethod;
+use PHPMovic\Utils\DateUtils;
 
 /**
  * Class representing request to the server.
  */
 class Request
 {
-    /**
-     * Counter of requests.
-     */
-    private static float $counter = 0.0;
-
     /**
      * Method used to execute request.
      */
@@ -55,7 +51,7 @@ class Request
     /**
      * Data of request.
      */
-    private readonly array $data;
+    private array $data;
 
     /**
      * Headers of request.
@@ -76,6 +72,11 @@ class Request
      * Number of request.
      */
     private readonly float $number;
+
+    /**
+     * Time of request handling start.
+     */
+    private readonly \DateTime $time;
 
     /**
      * Creates new object representing request from
@@ -99,13 +100,24 @@ class Request
         $this->headers = Request::parseHeaders();
         $this->cookies = Request::parseCookies();
         $this->session = Request::parseSession();
-        $this->number = Request::$counter;
-        Request::$counter += 1.0;
+        $counter = Application::counters()->create("REQUESTS");
+        $this->number = $counter->getValue();
+        $counter->increment();
+        $this->time = DateUtils::now();
         unset($_REQUEST);
         unset($_SESSION);
         unset($_COOKIE);
         unset($_POST);
         unset($_GET);
+    }
+
+    /**
+     * Adds additional data to request.
+     * @param array $data Data to add.
+     */
+    public function addData(array $data): void
+    {
+        $this->data = array_merge($this->data, $data);
     }
 
     /**
@@ -130,7 +142,7 @@ class Request
      */
     public function createResponse(): Response
     {
-        return new Response($this->cookies, $this->session, $this->number);
+        return new Response($this->cookies, $this->session, $this->number, $this->time, $this->source);
     }
 
     /**

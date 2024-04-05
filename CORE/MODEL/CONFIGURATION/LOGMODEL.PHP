@@ -74,6 +74,7 @@ class LogModel
      *                            logs saved into file.
      * @param bool $console Flag, whether logs should be also printed to browser console.
      * @param LogFormat $format Format of logs.
+     * @param LogFormat $formatDebug Format of logs at level Debug.
      * @param LogFormat $formatLow Format of logs at level Low.
      * @param LogFormat $formatBase Format of logs at level Base.
      * @param LogFormat $formatSuccess Format of logs at level Success.
@@ -90,6 +91,7 @@ class LogModel
         bool $fileUseFormat,
         bool $console,
         LogFormat $format,
+        ?LogFormat $formatDebug = null,
         ?LogFormat $formatLow = null,
         ?LogFormat $formatBase = null,
         ?LogFormat $formatSuccess = null,
@@ -98,6 +100,7 @@ class LogModel
         ?LogFormat $formatError = null,
         ?LogFormat $formatCritical = null)
     {
+        if ($formatDebug == null) $formatDebug = $format;
         if ($formatLow == null) $formatLow = $format;
         if ($formatBase == null) $formatBase = $format;
         if ($formatSuccess == null) $formatSuccess = $format;
@@ -106,6 +109,7 @@ class LogModel
         if ($formatError == null) $formatError = $format;
         if ($formatCritical == null) $formatCritical = $format;
         $this->formats = array(
+            LogLevel::Debug->toString() => $formatDebug,
             LogLevel::Low->toString() => $formatLow,
             LogLevel::Base->toString() => $formatBase,
             LogLevel::Success->toString() => $formatSuccess,

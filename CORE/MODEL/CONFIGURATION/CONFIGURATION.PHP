@@ -24,6 +24,7 @@ use PHPMovic\Model\Configuration\ConnectionModel;
 use PHPMovic\Model\Configuration\LogModel;
 use PHPMovic\Model\Configuration\SourcesModel;
 use PHPMovic\Model\Configuration\RouterModel;
+use PHPMovic\Model\Configuration\CountersModel;
 
 /**
  * Class which holds whole configuration of the application.
@@ -60,6 +61,11 @@ class Configuration
      */
     private readonly RouterModel $routes;
 
+    /**
+     * Model of counters of application.
+     */
+    private readonly CountersModel $countersModel;
+
 
     /**
      * Default time zone of application.
@@ -75,6 +81,7 @@ class Configuration
      * @param SourcesModel $sourcesModel Model of all sources of application.
      * @param RouterModel $routes Model of router of application.
      * @param string $timezone Default time zone of application.
+     * @param CountersModel $countersModel Model of counters of application.
      */
     public function __construct(
         DateTimeFormat $dateTimeFormat,
@@ -83,7 +90,8 @@ class Configuration
         LogModel $logModel,
         SourcesModel $sourcesModel,
         RouterModel $routes,
-        string $timezone)
+        string $timezone,
+        CountersModel $countersModel)
     {
         $this->dateTimeFormat = $dateTimeFormat;
         $this->phpErrors = $phpErrors;
@@ -92,6 +100,7 @@ class Configuration
         $this->sourcesModel = $sourcesModel;
         $this->routes = $routes;
         $this->timezone = $timezone;
+        $this->countersModel = $countersModel;
     }
 
     /**
@@ -156,6 +165,15 @@ class Configuration
     public function getTimezone(): string
     {
         return $this->timezone;
+    }
+
+    /**
+     * Gets model of counters of application.
+     * @return CountersModel Counters model.
+     */
+    public function getCountersModel(): CountersModel
+    {
+        return $this->countersModel;
     }
 }
 

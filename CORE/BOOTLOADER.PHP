@@ -71,6 +71,7 @@ class Bootloader
         $this->setTimezone();
         $this->startSession();
         $this->application = new Application($this, $this->configuration);
+        Application::logger()->debug("Bootloader finished");
         return $this->application;
     }
 

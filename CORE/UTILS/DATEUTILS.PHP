@@ -48,6 +48,39 @@ abstract class DateUtils
         $reti = new DateTime('now', DateUtils::getDefaultTimezone());
         return $reti;
     }
+
+    /**
+     * Gets time elapsed between two dates and times in human readable format.
+     * @param DateTime $start Start date and time.
+     * @param DateTime $end End date and time.
+     * @return string Time elapsed between two dates and times in human readable format.
+     */
+    public static function elapsed(DateTime $start, DateTime $end): string
+    {
+        $interval = $start->diff($end);
+    
+        $elapsed = '';
+        if ($interval->days > 0) {
+            $elapsed .= $interval->days . ' day' . ($interval->days > 1 ? 's ' : ' ');
+        }
+        if ($interval->h > 0) {
+            $elapsed .= $interval->h . ' hour' . ($interval->h > 1 ? 's ' : ' ');
+        }
+        if ($interval->i > 0) {
+            $elapsed .= $interval->i . ' minute' . ($interval->i > 1 ? 's ' : ' ');
+        }
+        if ($interval->s > 0) {
+            $elapsed .= $interval->s . ' second' . ($interval->s > 1 ? 's ' : ' ');
+        }
+        if ($interval->f > 0) {
+            $elapsed .= $interval->f . ' millisecond';
+        }
+
+        // Trim any extra space at the end
+        $elapsed = trim($elapsed);
+
+        return $elapsed;
+    }
 }
 
 ?>

@@ -20,6 +20,8 @@
 namespace PHPMovic\Model\Server;
 
 use PHPMovic\Model\Server\ViewData;
+use PHPMovic\View\Printable;
+use PHPMovic\View\View;
 use PHPMovic\View\ViewManager;
 
 /**
@@ -28,9 +30,9 @@ use PHPMovic\View\ViewManager;
 class ViewInsert
 {
     /**
-     * Name of view to insert.
+     * View to insert.
      */
-    private readonly string $view;
+    private readonly View $view;
 
     /**
      * Data of view.
@@ -39,20 +41,20 @@ class ViewInsert
 
     /**
      * Creates new insertion of view to response.
-     * @param string $view Name of view to insert.
+     * @param View $view NView to insert.
      * @param ViewData $data Data of view.
      */
-    public function __construct(string $view, ViewData $data)
+    public function __construct(View $view, ViewData $data)
     {
         $this->view = $view;
         $this->data = $data;
     }
 
     /**
-     * Gets name of view to insert.
-     * @return string Name of view to insert.
+     * Gets view to insert.
+     * @return View View to insert.
      */
-    public function getView(): string
+    public function getView(): View
     {
         return $this->view;
     }
@@ -71,7 +73,7 @@ class ViewInsert
      */
     public function insert(): void
     {
-        ViewManager::requestView($this->getView(), $this->getData());
+        $this->view->render(new Printable($this->data));
     }
 }
 

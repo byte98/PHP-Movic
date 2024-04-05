@@ -19,6 +19,9 @@
 
 namespace PHPMovic\Model\Server;
 
+use PHPMovic\View\View;
+use PHPMovic\Model\Server\HttpStatus;
+
 /**
  * Class representing response to the request.
  */
@@ -32,7 +35,7 @@ class Response
     /**
      * Code of response.
      */
-    private int $responseCode;
+    private HttpStatus $responseCode;
 
     /**
      * Headers of response.
@@ -50,24 +53,44 @@ class Response
     private array $session;
 
     /**
+     * Flag, whether session should be flushed.
+     */
+    private bool $flushSession;
+
+    /**
      * Number of response.
      */
     private readonly float $number;
+
+    /**
+     * Time of request handling start.
+     */
+    private readonly \DateTime $requestTime;
+
+    /**
+     * Address to which response will be sent.
+     */
+    private readonly string $address;
 
     /**
      * Creates new response.
      * @param array $cookies Array with set cookies.
      * @param array $session Data in actual session.
      * @param float $number Number of response (should be same as number of request).
+     * @param \DateTime $requestTime Time of request handling start.
+     * @param string $address Address to which response will be sent.
      */
-    public function __construct(array $cookies, array $session, float $number)
+    public function __construct(array $cookies, array $session, float $number, \DateTime $requestTime, string $address)
     {
         $this->views = array();
-        $this->responseCode = 200;
+        $this->responseCode = HttpStatus::OK;
         $this->headers = array();
         $this->cookies = $cookies;
         $this->session = $session;
         $this->number = $number;
+        $this->requestTime = $requestTime;
+        $this->flushSession = false;
+        $this->address = $address;
     }
 
     /**
@@ -91,20 +114,51 @@ class Response
     }
 
     /**
+     * Removes cookie.
+     * @param string $name Name of cookie.
+     */
+    public function removeCookie(string $name): void
+    {
+        if (array_key_exists($name, $this->cookies))
+        {
+            unset($this->cookies[$name]);
+        }
+    }
+
+    /**
+     * Sets value in session.
+     * @param string $name Name of value.
+     * @param mixed $value Value itself.
+     */
+    public function setSession(string $name, mixed $value): void
+    {
+        $this->session[$name] = $value;
+    }
+
+    /**
+     * Flushes all data in session.
+     */
+    public function flushSession(): void
+    {
+        $this->flushSession = true;
+        $this->session = array();
+    }
+
+    /**
      * Adds view to response.
-     * @param string $viewName Name of view.
+     * @param View $view View to add.
      * @param ViewData $data Data of view.
      */
-    public function addView(string $viewName, ViewData $data = new ViewData()): void
+    public function addView(View $view, ViewData $data = new ViewData()): void
     {
-        array_push($this->views, new ViewInsert($viewName, $data));
+        array_push($this->views, new ViewInsert($view, $data));
     }
 
     /**
      * Sets code of response.
-     * @param int $code Code of response.
+     * @param HttpStatus $code Code of response.
      */
-    public function setResponseCode(int $code): void
+    public function setResponseCode(HttpStatus $code): void
     {
         $this->responseCode = $code;
     }
@@ -129,9 +183,9 @@ class Response
 
     /**
      * Gets code of response.
-     * @return int Code of response.
+     * @return HttpStatus Code of response.
      */
-    public function getResponseCode(): int
+    public function getResponseCode(): HttpStatus
     {
         return $this->responseCode;
     }
@@ -143,6 +197,52 @@ class Response
     public function getNumber(): string
     {
         return $this->number;
+    }
+
+    /**
+     * Gets time of request handling start.
+     * @return \DateTime Time of request handling start.
+     */
+    public function getRequestTime(): \DateTime
+    {
+        return $this->requestTime;
+    }
+
+    /**
+     * Gets session data.
+     * @return array Session data.
+     */
+    public function getSession(): array
+    {
+        return $this->session;
+    }
+
+    /**
+     * Gets cookies data.
+     * @return array Cookies data.
+     */
+    public function getCookies(): array
+    {
+        return $this->cookies;
+    }
+
+    /**
+     * Gets flag, whether session should be flushed.
+     * @return bool TRUE if session should be flushed,
+     *              FALSE otherwise.
+     */
+    public function getFlushSession(): bool
+    {
+        return $this->flushSession;
+    }
+
+    /**
+     * Gets address to which response will be sent.
+     * @return string Address to which response will be sent.
+     */
+    public function getAddress(): string
+    {
+        return $this->address;
     }
 }
 

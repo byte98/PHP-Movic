@@ -32,12 +32,16 @@ DateFormat: "%0d%-%0m%-%y% %0H%:%0M%:%0S%.%0U%"
 # For more information, please see https://www.php.net/manual/en/timezones.php.
 Timezone: "Europe/Prague"
 
-
 # Flag, whether PHP errors should be displayed or not.
 # Allowed values:
 #   True: display PHP errors
 #   False: do not display PHP errors
 PHPErrors: True
+
+# File to which counters will be stored.
+# PHP-Movic uses various counters across whole application. To store
+# them in one place, all counters will be stored in one file.
+Counters: "COUNTERS.TXT"
 
 # Namespace of all user content. All classes in /CONTENT folder
 # are expected to be in this namespace.
@@ -55,8 +59,8 @@ ContentNamespace: "MyApp"
 LogsAllowed: True
 
 # Minimal level of log whihc will be actually outputted.
-# Allowed values: LOW, BASE, INFO, SUCCESS, WARNING, ERROR, CRITICAL
-LogLevel: LOW
+# Allowed values: DEBUG, LOW, BASE, INFO, SUCCESS, WARNING, ERROR, CRITICAL
+LogLevel: DEBUG
 
 # Directory where all log files will be stored.
 LogDir: "LOGS"
@@ -79,11 +83,12 @@ LogUseFormat: False
 #    <level>: "<format">
 #    <level>: "<format>"
 #    ...
-# where <level> is one of: LOW, BASE, INFO, SUCCESS, WARNING, ERROR, CRITICAL
+# where <level> is one of: DEBUG, LOW, BASE, INFO, SUCCESS, WARNING, ERROR, CRITICAL
 # and <format> is format string of log (same as LogFormat)
 # This setting overrides LogFormat.
 LogLevelFormat:
-    LOW: "%I%%CF[GRAY]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    DEBUG: "%I%%CF[GRAY]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
+    LOW: "%CF[GRAY]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
     BASE: "%CF[WHITE]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
     INFO: "%CF[CYAN]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
     SUCCESS: "%CF[GREEN]%%DATE% [ %PDLVL% ]: %MESSAGE%%FR%"
@@ -133,5 +138,5 @@ Routes:
 # Where <route> is any path of request and <path> is path
 # to folder within /CONTENT folder.
 StaticRoutes:
-    "/static/css": "/STYLES"
-    "/static/js": "/SCRIPTS"
+    "/static/css": "/STATIC/STYLES"
+    "/static/js": "/STATIC/SCRIPTS"

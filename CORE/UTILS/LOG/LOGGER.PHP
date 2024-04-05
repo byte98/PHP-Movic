@@ -24,6 +24,7 @@ use PHPMovic\Utils\Event\AbstractEventSource;
 use PHPMovic\Utils\Format\DateTimeFormat;
 use PHPMovic\Utils\Log\Log;
 use PHPMovic\Utils\Log\LogLevel;
+use PHPMovic\Utils\PathUtils;
 
 /**
  * Class which performs logging.
@@ -89,12 +90,7 @@ class Logger extends AbstractEventSource
      */
     private function getFilePath(\DateTime $date): string
     {
-        $reti = $this->logModel->getPath();
-        if (str_starts_with($reti, DIRECTORY_SEPARATOR) == false && preg_match('/^[a-zA-Z]:/', $reti) == false)
-        // Path does not start with / or C:/ (script assumes that path is relative)
-        {
-            $reti = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . $reti;
-        }
+        $reti = PathUtils::toAbsolute($this->logModel->getPath());
         $reti .= DIRECTORY_SEPARATOR . $date->format("Y-m-d") . ".log";
         return $reti;
     }
@@ -208,6 +204,15 @@ class Logger extends AbstractEventSource
     public function log(LogLevel $level, string $message): void
     {
         $this->handleLog(Log::createNow($message, $level));
+    }
+
+    /**
+     * Performs debug level logging.
+     * @param string $message Message of log.
+     */
+    public function debug(string $message): void
+    {
+        $this->log(LogLevel::Debug, $message);
     }
 
     /**

@@ -19,6 +19,7 @@
 
 namespace PHPMovic\Controller;
 
+use PHPMovic\Model\Server\HttpStatus;
 use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\Response;
 
@@ -31,28 +32,28 @@ abstract class ControllerAdapter implements Controller
     public function get(Request $request): Response
     {
         $reti = $request->createResponse();
-        $reti->setResponseCode(405); // 405 Method Not Allowed
+        $reti->setResponseCode(HttpStatus::MethodNotAllowed); // 405 Method Not Allowed
         return $reti;
     }
 
     public function post(Request $request): Response
     {
         $reti = $request->createResponse();
-        $reti->setResponseCode(405); // 405 Method Not Allowed
+        $reti->setResponseCode(HttpStatus::MethodNotAllowed); // 405 Method Not Allowed
         return $reti;
     }
 
     public function put(Request $request): Response
     {
         $reti = $request->createResponse();
-        $reti->setResponseCode(405); // 405 Method Not Allowed
+        $reti->setResponseCode(HttpStatus::MethodNotAllowed); // 405 Method Not Allowed
         return $reti;
     }
 
     public function delete(Request $request): Response
     {
         $reti = $request->createResponse();
-        $reti->setResponseCode(405); // 405 Method Not Allowed
+        $reti->setResponseCode(HttpStatus::MethodNotAllowed); // 405 Method Not Allowed
         return $reti;
     }
 }
