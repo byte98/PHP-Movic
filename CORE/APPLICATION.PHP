@@ -29,6 +29,8 @@ use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\HttpMethod;
 use PHPMovic\Utils\Counter\CountersManager;
 use PHPMovic\Utils\StringUtils;
+use PHPMovic\View\SimpleView;
+use PHPMovicMySQLDriver;
 
 /**
  * Class which represents whole application.
@@ -79,8 +81,8 @@ class Application
     {
         $this->bootloader = $bootloader;
         $this->configuration = $configuration;
-        Application::$countersManager = new CountersManager($this->configuration->getCountersModel());
         Application::$logger = new Logger($configuration->getLogModel(), $configuration->getDateTimeFormat());
+        Application::$countersManager = new CountersManager($this->configuration->getCountersModel());
         Application::$sourceLoader = new SourceLoader($configuration->getSourcesModel());
         $this->changeAutoloader();
         $this->router = new Router($this->configuration);
@@ -112,6 +114,9 @@ class Application
         // Reset requests counter
         //$counter = Application::counters()->create("REQUESTS");
         //$counter->reset();
+
+        // Set namespace for views
+        SimpleView::setRoot($this->configuration->getSourcesModel()->getUserNamespace());
 
     }
 

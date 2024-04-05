@@ -152,7 +152,7 @@ class Responder
         $counter = 0;
         foreach($response->getViews() as $view)
         {
-            $view->getInsert()->insert();
+            $view->insert();
             $counter++;
             Application::logger()->debug("Response (#" . $response->getNumber() . " to " . $response->getAddress() . "): view inserted: " . $view->getView()::class);
         }

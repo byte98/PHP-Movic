@@ -1,3 +1,4 @@
+<?php
 // PHP-Movic - base platform for PHP applications.
 // Copyright (C) 2024 Jiri Skoda <developer@skodaj.cz>
 // 
@@ -16,3 +17,35 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+namespace PHPMovic\Model\Database;
+use PHPMovic\Model\Configuration\ConnectionModel;
+
+/**
+ * Class which manages connections to the database.
+ */
+class DatabaseManager
+{
+    /**
+     * Array with all managed connections.
+     */
+    private array $connections;
+
+    /**
+     * Model of connection to the database.
+     */
+    private readonly ConnectionModel $model;
+
+    /**
+     * Creates new manager of connections to the database.
+     * @param ConnectionModel $model Model of connection to the database.
+     */
+    public function __construct(ConnectionModel $model)
+    {
+        $this->model = $model;
+        $this->connections = array();
+    }
+
+    
+}
+
+?>

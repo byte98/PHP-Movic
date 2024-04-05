@@ -17,29 +17,17 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-// This file contains demonstration of basic functionality
-// of PHP-Movic. It is not intended to be used in production.
-// For more information, please see project wikipedia at
-// https://github.com/byte98/PHP-Movic/wiki
-
-namespace MyApp\Controller;
-
-use PHPMovic\Controller\ControllerAdapter;
-use PHPmovic\Model\Server\Request;
-use PHPmovic\Model\Server\Response;
-use PHPmovic\Controller\Controller;
-use PHPMovic\View\SimpleView;
-
-class HomePageController extends ControllerAdapter
-{
-
-    public function get(Request $request): Response
-    {
-        $reti = $request->createResponse();
-        $reti->addView(new SimpleView("HOMEPAGEVIEW"));
-        return $reti;
-    }
-
-}
 
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello world!</title>
+</head>
+<body>
+    <h1>It works!</h1>
+</body>
+</html>

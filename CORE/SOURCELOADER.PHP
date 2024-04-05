@@ -90,6 +90,7 @@ class SourceLoader
      */
     private function determineSourcePath(string $className): string
     {
+        //Application::logger()->low("Looking for class '" . $className . "'...");
         $prefix = $_SERVER["DOCUMENT_ROOT"];
         $prefix .= DIRECTORY_SEPARATOR;
         $filePart = "";
@@ -105,11 +106,19 @@ class SourceLoader
             $filePart = substr($className, strlen($nameParts[0]));
         }
         else
-        {   // Class is part of addon.
-            // TODO: Implement addons loading.
-            
+        {   
+            // It could be a driver
+            $prefix .= "DRIVERS";
+            $filePart = $className;
+            $reti = $this->getFilePath($prefix, $filePart);
+            if (file_exists($reti) == false)
+            {
+                // Class is part of addon.
+                // TODO: Implement addons loading.
+            }
         }
-        return $this->getFilePath($prefix, $filePart);
+        $reti = $this->getFilePath($prefix, $filePart);
+        return $reti;
     }
 
     /**
@@ -137,15 +146,21 @@ class SourceLoader
                 $p3 .= DIRECTORY_SEPARATOR;
             }
         }
-        if (str_ends_with($fileName, ".php") == false && str_ends_with($fileName, ".PHP") == false)
+        if (str_ends_with($fileName, ".php") == false && str_ends_with($fileName, ".PHP") == false && str_ends_with($fileName, ".phtml") == false && str_ends_with($fileName, ".PHTML") == false)
         {
-            $p1a = $p1 . ".php";
-            $p1b = $p1 . ".PHP";
-            $p2a = $p2 . ".php";
-            $p2b = $p2 . ".PHP";
-            $p3a = $p3 . ".php";
-            $p3b = $p3 . ".PHP";
-            array_push($check, $p1a, $p1b, $p2a, $p2b, $p3a, $p3b);
+            $p1a = $p1 . ".phtml";
+            $p1b = $p1 . ".PHTML";
+            $p1c = $p1 . ".php";
+            $p1d = $p1 . ".PHP";
+            $p2a = $p2 . ".phtml";
+            $p2b = $p2 . ".PHTML";
+            $p2c = $p2 . ".php";
+            $p2d = $p2 . ".PHP";
+            $p3a = $p3 . ".phtml";
+            $p3b = $p3 . ".PHTML";
+            $p3c = $p3 . ".php";
+            $p3d = $p3 . ".PHP";
+            array_push($check, $p1a, $p1b, $p1c, $p1d, $p2a, $p2b, $p2c, $p2d, $p3a, $p3b, $p3c, $p3d);
         }
         else
         {
