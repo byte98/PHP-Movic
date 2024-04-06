@@ -33,16 +33,18 @@ class QueryResult extends QueryInfo
     /**
      * Creates new result of query.
      * @param bool $success Flag, whether query has been successfull or not.
+     * @param string $query Query which was executed.
      * @param array $results Array with results of query.
+     * @param string $message Message about query execution.
      */
-    public function __construct(bool $success, array $results = array())
+    public function __construct(bool $success, string $query, array $results = array(), string $message = "")
     {
         $rows = 0;
         if(count($results) > 0)
         {
             $rows = count($results);
         }
-        parent::__construct($success, $rows);
+        parent::__construct($success, $query, $message, $rows);
         $this->results = $results;
     }
 

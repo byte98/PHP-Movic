@@ -22,35 +22,50 @@ namespace PHPMovic\Model;
 use PHPMovic\Model\DatabaseType;
 
 /**
- * Class representing property of database object.
+ * Class representing model of database object property.
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
-class DatabaseProperty
+class DatabasePropertyModel
 {
     /**
-     * Data type of property.
-     */
-    private readonly DatabaseType $type;
-
-    /**
-     * Name of column where property is stored.
+     * Name of column in which is property stored.
      */
     private readonly string $column;
 
     /**
-     * Creates new property of database object.
-     * @param DatabaseType $type Data type of property.
-     * @param string $column Name of column where property is stored.
+     * Database type of property.
      */
-    public function __construct(DatabaseType $type, string $column)
+    private readonly DatabaseType $type;
+
+    /**
+     * Name of property in actual object.
+     */
+    private readonly string $name;
+
+    /**
+     * Creates new model of database object property.
+     * @param string $column Name of column in which is property stored.
+     * @param DatabaseType $type Database type of property.
+     * @param string $name Name of property in actual object.
+     */
+    public function __construct(string $column, DatabaseType $type, string $name)
     {
-        $this->type = $type;
         $this->column = $column;
+        $this->type = $type;
+        $this->name = $name;
     }
 
     /**
-     * Gets data type of property.
-     * @return DatabaseType Data type of property.
+     * Gets name of property in actual object.
+     * @return string Name of property in actual object.
+     */
+    public function getColumn(): string
+    {
+        return $this->column;
+    }
+
+    /**
+     * Gets database type of property.
+     * @return DatabaseType Database type of property.
      */
     public function getType(): DatabaseType
     {
@@ -58,12 +73,12 @@ class DatabaseProperty
     }
 
     /**
-     * Gets name of column where property is stored.
-     * @return string Name of column where property is stored.
+     * Gets name of property in actual object.
+     * @return string Name of property in actual object.
      */
-    public function getColumn(): string
+    public function getName(): string
     {
-        return $this->column;
+        return $this->name;
     }
 }
 

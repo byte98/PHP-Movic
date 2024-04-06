@@ -28,15 +28,37 @@ use PHPMovic\Controller\ControllerAdapter;
 use PHPmovic\Model\Server\Request;
 use PHPmovic\Model\Server\Response;
 use PHPmovic\Controller\Controller;
+use PHPMovic\Model\Server\ViewData;
 use PHPMovic\View\SimpleView;
+use PHPMovicIdentity\PHPMovicIdentity;
 
 class HomePageController extends ControllerAdapter
 {
 
     public function get(Request $request): Response
     {
+        $im = PHPMovicIdentity::getManager();
+        
         $reti = $request->createResponse();
-        $reti->addView(new SimpleView("HOMEPAGEVIEW"));
+        $data = new ViewData();
+        $data->set("identities", $this->formatIdentities($im->getAllIdentities()));
+        $reti->addView(new SimpleView("HOMEPAGEVIEW"), $data);
+        return $reti;
+    }
+
+    /**
+     * Formats identities to be shown in the view.
+     * @param array $identities Identities to format.
+     * @return string Formatted identities.
+     */
+    private function formatIdentities(array $identities): string
+    {
+        $reti = "<table><tr><th>ID</th><th>NAME</th><th>PASSWORD</th></tr>";
+        foreach ($identities as $identity)
+        {
+            $reti .= "<tr><td>" . $identity->getId() ."</td><td>" . $identity->getName() . "</td></tr>";
+        }
+        $reti .= "</table>";
         return $reti;
     }
 

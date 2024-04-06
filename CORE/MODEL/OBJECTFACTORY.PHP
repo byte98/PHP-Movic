@@ -20,33 +20,26 @@
 namespace PHPMovic\Model;
 
 /**
- * Class which represents object stored in the database.
+ * Inteface abstracting factories for creating other objects.
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
-class DatabaseObject
+interface ObjectFactory
 {
     /**
-     * Name of table in which object should be stored.
+     * Creates one object.
+     * @param array $data Data from database.
+     * @return object Newly created object with data from database,
+     *                or NULL if object cannot be created from data.
      */
-    private readonly string $table;
+    public function createOne(array $data): ?object;
 
     /**
-     * Creates new object which is stored in the database.
-     * @param string $table Name of table in which object should be stored.
+     * Creates every possible object based on data from database.
+     * @param array $data Data from database.
+     * @return array Array with every possible object based on data from database,
+     *               or empty array if object cannot be created from data.
+     * 
      */
-    public function __construct(string $table)
-    {
-        $this->table = $table;   
-    }
-
-    /**
-     * Gets name of table in which object should be stored.
-     * @return string Name of table in which object should be stored.
-     */
-    public function getTable(): string
-    {
-        return $this->table;
-    }
+    public function createMany(array $data): array;
 }
 
 ?>

@@ -19,6 +19,7 @@
 
 use PHPMovic\Model\Configuration\ConnectionModel;
 use PHPMovic\Model\Database\Driver;
+use PHPMovic\Model\Database\Query;
 use PHPMovic\Model\Database\QueryInfo;
 use PHPMovic\Model\Database\QueryResult;
 
@@ -29,31 +30,47 @@ class PHPMovicMySQLDriver implements Driver
      */
     private ?\mysqli $connection = null;
 
-    public function query(string $query): QueryResult
+    public function query(Query $query): QueryResult
     {
-        $reti = new QueryResult(false);
-        $result = $this->connection->query($query);
-        if ($result != false)
+        $queryString = $query->build();
+        $reti = new QueryResult(false, query: $queryString);
+        try
         {
-            $data = array();
-            while ($row = $result->fetch_assoc())
+            $result = $this->connection->query($queryString);
+            if ($result != false)
             {
-                array_push($data, $row);
+                $data = array();
+                while ($row = $result->fetch_assoc())
+                {
+                    array_push($data, $row);
+                }
+                $reti = new QueryResult(true, $queryString, $data);
             }
-            $reti = new QueryResult(true, $data);
+        }
+        catch (mysqli_sql_exception $ex)
+        {
+            $reti = new QueryResult(false, query: $queryString, message: $ex->getMessage());
         }
         return $reti;
     }
 
-    public function execute(string $query): QueryInfo
+    public function execute(Query $query): QueryInfo
     {
-        $reti = new QueryInfo(false);
-        $result = $this->connection->query($query);
-        if ($result != false)
+        $queryString = $query->build();
+        $reti = new QueryInfo(false, query: $queryString);
+        try
         {
-            $id = $this->connection->insert_id;
-            $affected = $this->connection->affected_rows;
-            $reti = new QueryInfo($id, $affected, $result);
+            $result = $this->connection->query($queryString);
+            if ($result != false)
+            {
+                $id = $this->connection->insert_id;
+                $affected = $this->connection->affected_rows;
+                $reti = new QueryInfo($id, $queryString, "", $affected, $result);
+            }
+        }
+        catch (mysqli_sql_exception $ex)
+        {
+            $reti = new QueryResult(false, query: $queryString, message: $ex->getMessage());
         }
         return $reti;
     }
@@ -109,6 +126,20 @@ class PHPMovicMySQLDriver implements Driver
         if ($this->connection != null)
         {
             $reti = $this->connection->ping();
+        }
+        return $reti;
+    }
+
+    public function sanitizeValue(string $value): string
+    {
+        $reti = "";
+        if ($this->connection != null)
+        {
+            $reti = $this->connection->escape_string($value);
+        }
+        else
+        {
+            Application::logger()->warning("Cannot sanitize value: connection has not been created yet!");
         }
         return $reti;
     }

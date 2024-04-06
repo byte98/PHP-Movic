@@ -40,16 +40,30 @@ class QueryInfo
     private readonly ?int $lastId;
 
     /**
+     * Message about query execution.
+     */
+    private readonly string $message;
+
+    /**
+     * Query which has been actually executed.
+     */
+    private readonly string $query;
+
+    /**
      * Creates new wrapper of informatino about query execution.
      * @param bool $success Flag, whether query has been successfull or not.
+     * @param string $query Query which has been actually executed.
+     * @param string $message Message about query execution.
      * @param int $affectedRows Number of rows affected by query.
      * @param ?int $lastId Identifier of last inserted enity to database.
      */
-    public function __construct(bool $success, int $affectedRows = 0, ?int $lastId = null)
+    public function __construct(bool $success, string $query, string $message = "", int $affectedRows = 0, ?int $lastId = null)
     {
         $this->success = $success;
         $this->affectedRows = $affectedRows;
         $this->lastId = $lastId;
+        $this->message = $message;
+        $this->query = $query;
     }
 
     /**
@@ -79,6 +93,24 @@ class QueryInfo
     public function getLastInsertId(): ?int
     {
         return $this->lastId;
+    }
+
+    /**
+     * Gets message about query execution.
+     * @return string Message about query execution.
+     */
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    /**
+     * Gets query which has been actually executed.
+     * @return string Query which has been actually executed.
+     */
+    public function getQuery(): string
+    {
+        return $this->query;
     }
 }
 

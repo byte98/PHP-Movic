@@ -17,36 +17,36 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-namespace PHPMovic\Model;
+namespace PHPMovic;
+use PHPMovic\Model\AddonInfo;
 
 /**
- * Class which represents object stored in the database.
+ * Interface for all addons which could be added to platform.
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
-class DatabaseObject
+interface Addon
 {
     /**
-     * Name of table in which object should be stored.
+     * Gets information about addon.
+     * @return AddonInfo Information about addon.
      */
-    private readonly string $table;
+    public function getInfo(): AddonInfo;
 
     /**
-     * Creates new object which is stored in the database.
-     * @param string $table Name of table in which object should be stored.
+     * Initializes addon.
+     * @param array $config Configuration of addon parsed from
+     *                      its configuration file.
+     * @return bool TRUE if initialization was successful,
+     *              FALSE otherwise.
      */
-    public function __construct(string $table)
-    {
-        $this->table = $table;   
-    }
+    public function init(array $config): bool;
 
     /**
-     * Gets name of table in which object should be stored.
-     * @return string Name of table in which object should be stored.
+     * Stops addon. Addon may save all data in this step,
+     * if it needs to do so.
+     * @return bool TRUE if stop was successful, FALSE otherwise.
      */
-    public function getTable(): string
-    {
-        return $this->table;
-    }
+    public function stop(): bool;
+
 }
 
 ?>

@@ -59,7 +59,7 @@ class SimpleView implements View
 
     public function render(Printable $data): void
     {
-        $_VIEW = $data;
+        $GLOBALS["_VIEW"] = $data;
         Application::loadSource(SimpleView::$root . "\\" . "VIEW" . "\\" . $this->template);
     }
 }

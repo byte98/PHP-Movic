@@ -17,35 +17,33 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-namespace PHPMovic\Model;
+namespace PHPMovic\Utils;
 
 /**
- * Class which represents object stored in the database.
+ * Class with some utility function to work with arrays.
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
-class DatabaseObject
+abstract class ArrayUtils
 {
     /**
-     * Name of table in which object should be stored.
+     * Checks, whether value is in array and whether has expected type.
+     * @param array $data Array which will be checked.
+     * @param string $key Key of value expected in array.
+     * @param string $type Expected type of value.
+     * @return bool TRUE if value exists and has expected type,
+     *              FALSE otherwise.
      */
-    private readonly string $table;
-
-    /**
-     * Creates new object which is stored in the database.
-     * @param string $table Name of table in which object should be stored.
-     */
-    public function __construct(string $table)
+    public static function checkValue(array $data, string $key, string $type): bool
     {
-        $this->table = $table;   
-    }
-
-    /**
-     * Gets name of table in which object should be stored.
-     * @return string Name of table in which object should be stored.
-     */
-    public function getTable(): string
-    {
-        return $this->table;
+        $reti = false;
+        if (array_key_exists($key, $data))
+        {
+            $dt = gettype($data[$key]);
+            if ($dt == $type)
+            {
+                $reti = true;
+            }
+        }
+        return $reti;
     }
 }
 

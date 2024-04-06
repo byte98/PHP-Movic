@@ -80,6 +80,11 @@ class Application
     private static ?DatabaseManager $databaseManager = null;
 
     /**
+     * Loader of addons.
+     */
+    private readonly AddonLoader $addonLoader;
+
+    /**
      * Creates new instance of application.
      * @param Bootloader $bootloader Bootloader of whole application.
      * @param Configuration $configuration Configuration of application.
@@ -95,6 +100,7 @@ class Application
         $this->router = new Router($this->configuration);
         $this->responder = new Responder();
         Application::$databaseManager = new DatabaseManager($this->configuration->getConnectionModel());
+        $this->addonLoader = new AddonLoader($_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "ADDONS");
         $this->init();
     }
 
@@ -125,7 +131,12 @@ class Application
 
         // Set namespace for views
         SimpleView::setRoot($this->configuration->getSourcesModel()->getUserNamespace());
+
+        // Load addons
+        $this->addonLoader->loadAll();
+
         Application::logger()->low("Application loaded in " . DateUtils::elapsed($this->bootloader->getStart(), DateUtils::now())); 
+
     }
 
     /**
@@ -165,7 +176,7 @@ class Application
         {
             Application::logger()->warning("Request cannot be handled: no route defined for '" . $request->getResource() . "'!");
         }
-        Application::db()->close();
+        $this->addonLoader->stopAll();
         Application::$databaseManager->closeAll();
         Application::logger()->low("Application finished in " . DateUtils::elapsed($this->bootloader->getStart(), DateUtils::now()));
     }

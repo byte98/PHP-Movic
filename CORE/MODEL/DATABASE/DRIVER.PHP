@@ -20,6 +20,7 @@
 namespace PHPMovic\Model\Database;
 
 use PHPMovic\Model\Configuration\ConnectionModel;
+use PHPMovic\Model\Database\Query;
 use PHPMovic\Model\Database\QueryInfo;
 use PHPMovic\Model\Database\QueryResult;
 
@@ -31,17 +32,17 @@ interface Driver
 {
     /**
      * Performs query to the database.
-     * @param string $query String representing query to the database.
+     * @param Query $query Query which will be sent to the database.
      * @return QueryResult Result of the query.
      */
-    public function query(string $query): QueryResult;
+    public function query(Query $query): QueryResult;
 
     /**
      * Executes query to the database.
-     * @param string $query String representing query to the database.
+     * @param Query $query Query which will be sent to the database.
      * @return QueryInfo Result of the query.
      */
-    public function execute(string $query): QueryInfo;
+    public function execute(Query $query): QueryInfo;
 
     /**
      * Connects to the database.
@@ -64,6 +65,14 @@ interface Driver
      *              FALSE otherwise.
      */
     public function isOpen(): bool;
+
+    /**
+     * Sanitizes given value before it is used in query to prevent
+     * SQL injections.
+     * @param string $value Value to be sanitized.
+     * @return string Sanitized value.
+     */
+    public function sanitizeValue(string $value): string;
 }
 
 ?>

@@ -19,33 +19,25 @@
 
 namespace PHPMovic\Model;
 
-/**
- * Class which represents object stored in the database.
- */
-#[\Attribute(\Attribute::TARGET_CLASS)]
-class DatabaseObject
+use PHPMovic\Model\ObjectFactory;
+
+abstract class AbstractObjectFactory implements ObjectFactory
 {
-    /**
-     * Name of table in which object should be stored.
-     */
-    private readonly string $table;
-
-    /**
-     * Creates new object which is stored in the database.
-     * @param string $table Name of table in which object should be stored.
-     */
-    public function __construct(string $table)
+    public function createMany(array $data): array
     {
-        $this->table = $table;   
-    }
-
-    /**
-     * Gets name of table in which object should be stored.
-     * @return string Name of table in which object should be stored.
-     */
-    public function getTable(): string
-    {
-        return $this->table;
+        $reti = array();
+        foreach ($data as $row)
+        {
+            if (gettype($row) == "array")
+            {
+                $one = $this->createOne($row);
+                if ($one != null)
+                {
+                    array_push($reti, $one);
+                }
+            }
+        }
+        return $reti;
     }
 }
 

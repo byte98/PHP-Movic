@@ -77,7 +77,7 @@ class DatabaseManager
         }
         else
         {
-            Application::logger()->base("Reusing opened connection to the database");
+            Application::logger()->low("Reusing opened connection to the database");
         }
         return $reti;
     }

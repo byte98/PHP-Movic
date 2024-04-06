@@ -118,7 +118,20 @@ class SourceLoader
             if (file_exists($reti) == false)
             {
                 // Class is part of addon.
-                // TODO: Implement addons loading.
+                $prefix = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "ADDONS" . DIRECTORY_SEPARATOR;
+                $prefixes = array();
+                $filePart = $className;
+                array_push($prefixes, $prefix . $nameParts[0]);
+                array_push($prefixes, $prefix . strtolower($nameParts[0]));
+                array_push($prefixes, $prefix . strtoupper($nameParts[0]));
+                foreach($prefixes as $p)
+                {
+                    $reti = $this->getFilePath($p, $filePart);
+                    if (file_exists($reti))
+                    {
+                        break;
+                    }
+                }
             }
         }
         $reti = $this->getFilePath($prefix, $filePart);
