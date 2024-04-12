@@ -34,8 +34,7 @@ class BaseLoader
         $reti = "";
         $classPath = str_replace('\\', DIRECTORY_SEPARATOR, str_replace("PHPMovic\\", "", $className));
         $rootPath = $_SERVER["DOCUMENT_ROOT"];
-        $reti = $rootPath . DIRECTORY_SEPARATOR . strtoupper($classPath) . ".PHP";
-        $reti = str_replace("PHP-Movic/", "PHP-Movic/CORE/", $reti);
+        $reti = $rootPath . DIRECTORY_SEPARATOR . "CORE" .  DIRECTORY_SEPARATOR . strtoupper($classPath) . ".PHP";
         return $reti;
     }
 
