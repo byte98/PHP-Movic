@@ -71,51 +71,58 @@ class AddonLoader
     {
         $this->loadedClasses = array();
         $path_to_folder = $this->path;
-        $contents = scandir($path_to_folder);
-        $child_folders = array_filter($contents, function($item) use ($path_to_folder) {
-            return is_dir($path_to_folder . '/' . $item) && $item !== '.' && $item !== '..';
-        });
-        foreach($child_folders as $folder)
+        if (file_exists($path_to_folder))
         {
-            $folder = $this->path . $folder;  
-            $folderClasses = array();
-            Application::logger()->low("Looking into '" . $folder . "' for addon");
-            $contents = scandir($folder);
-            $php_files = array_filter($contents, function($item) use ($folder) {
-                return is_file($folder . '/' . $item) &&
-                    preg_match('/\.(php|phtml)$/i', $item);
+            $contents = scandir($path_to_folder);
+            $child_folders = array_filter($contents, function($item) use ($path_to_folder) {
+                return is_dir($path_to_folder . '/' . $item) && $item !== '.' && $item !== '..';
             });
-            foreach($php_files as $file)
+            foreach($child_folders as $folder)
             {
-                $file = $folder . DIRECTORY_SEPARATOR . $file;
-                Application::logger()->debug("Checking file '" . $file . "'");
-                $classes = $this->findClassesImplementingInterface($file, Addon::class);
-                if (count($classes) > 0)
+                $folder = $this->path . $folder;  
+                $folderClasses = array();
+                Application::logger()->low("Looking into '" . $folder . "' for addon");
+                $contents = scandir($folder);
+                $php_files = array_filter($contents, function($item) use ($folder) {
+                    return is_file($folder . '/' . $item) &&
+                        preg_match('/\.(php|phtml)$/i', $item);
+                });
+                foreach($php_files as $file)
                 {
-                    Application::logger()->debug("Addon found in '" . $file . "'");
-                    foreach( $classes as $class )
+                    $file = $folder . DIRECTORY_SEPARATOR . $file;
+                    Application::logger()->debug("Checking file '" . $file . "'");
+                    $classes = $this->findClassesImplementingInterface($file, Addon::class);
+                    if (count($classes) > 0)
                     {
-                        array_push($folderClasses, $class);
+                        Application::logger()->debug("Addon found in '" . $file . "'");
+                        foreach( $classes as $class )
+                        {
+                            array_push($folderClasses, $class);
+                        }
                     }
+                    else
+                    {
+                        Application::logger()->debug("No addon found in '" . $file . "'");
+                    }
+                }
+                if (count($folderClasses) > 1)
+                {
+                    Application::logger()->error("Addon loading from '" . $folder . "' failed: multiple addons found!");
+                }
+                else if (count($folderClasses) < 1)
+                {
+                    Application::logger()->warning("Addon loading from '" . $folder . "' failed: no addons found!");
                 }
                 else
                 {
-                    Application::logger()->debug("No addon found in '" . $file . "'");
+                    $className = $folderClasses[0];
+                    $this->loadClass($className);    
                 }
             }
-            if (count($folderClasses) > 1)
-            {
-                Application::logger()->error("Addon loading from '" . $folder . "' failed: multiple addons found!");
-            }
-            else if (count($folderClasses) < 1)
-            {
-                Application::logger()->warning("Addon loading from '" . $folder . "' failed: no addons found!");
-            }
-            else
-            {
-                $className = $folderClasses[0];
-                $this->loadClass($className);    
-            }
+        }
+        else
+        {
+            Application::logger()->base("Addons folder '" . $path_to_folder . "' does not exist - skipping addon loading");
         }
     }
 
