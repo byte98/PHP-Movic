@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+use PHPMovic\Application;
 use PHPMovic\Model\Configuration\ConnectionModel;
 use PHPMovic\Model\Database\Driver;
 use PHPMovic\Model\Database\Query;
@@ -33,23 +34,26 @@ class PHPMovicMySQLDriver implements Driver
     public function query(Query $query): QueryResult
     {
         $queryString = $query->build();
-        $reti = new QueryResult(false, query: $queryString);
-        try
+        $reti = new QueryResult(false, query: $queryString, message: "Query not executed: cannot find connection to the database!");
+        if ($this->connection != null)
         {
-            $result = $this->connection->query($queryString);
-            if ($result != false)
+            try
             {
-                $data = array();
-                while ($row = $result->fetch_assoc())
+                $result = $this->connection->query($queryString);
+                if ($result != false)
                 {
-                    array_push($data, $row);
+                    $data = array();
+                    while ($row = $result->fetch_assoc())
+                    {
+                        array_push($data, $row);
+                    }
+                    $reti = new QueryResult(true, $queryString, $data);
                 }
-                $reti = new QueryResult(true, $queryString, $data);
             }
-        }
-        catch (mysqli_sql_exception $ex)
-        {
-            $reti = new QueryResult(false, query: $queryString, message: $ex->getMessage());
+            catch (mysqli_sql_exception $ex)
+            {
+                $reti = new QueryResult(false, query: $queryString, message: $ex->getMessage());
+            }
         }
         return $reti;
     }
@@ -57,20 +61,23 @@ class PHPMovicMySQLDriver implements Driver
     public function execute(Query $query): QueryInfo
     {
         $queryString = $query->build();
-        $reti = new QueryInfo(false, query: $queryString);
-        try
+        $reti = new QueryInfo(false, query: $queryString, message: "Query not executed: cannot find connection to the database!");
+        if ($this->connection != null)
         {
-            $result = $this->connection->query($queryString);
-            if ($result != false)
+            try
             {
-                $id = $this->connection->insert_id;
-                $affected = $this->connection->affected_rows;
-                $reti = new QueryInfo($id, $queryString, "", $affected, $result);
+                $result = $this->connection->query($queryString);
+                if ($result != false)
+                {
+                    $id = $this->connection->insert_id;
+                    $affected = $this->connection->affected_rows;
+                    $reti = new QueryInfo($id, $queryString, "", $affected, $result);
+                }
             }
-        }
-        catch (mysqli_sql_exception $ex)
-        {
-            $reti = new QueryResult(false, query: $queryString, message: $ex->getMessage());
+            catch (mysqli_sql_exception $ex)
+            {
+                $reti = new QueryResult(false, query: $queryString, message: $ex->getMessage());
+            }
         }
         return $reti;
     }
@@ -93,7 +100,7 @@ class PHPMovicMySQLDriver implements Driver
         }
         catch(mysqli_sql_exception $ex)
         {
-            Application::logger()->warning("Cannot connect to database: " . $ex->getMessage());
+            Application::logger()->warning("Cannot connect to database: MySQLi#" . $ex->getCode() . " " . $ex->getMessage());
             $reti = false;
             $this->connection = null;
         }

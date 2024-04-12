@@ -73,6 +73,16 @@ class Configuration
     private readonly string $timezone;
 
     /**
+     * Path to favicon of application.
+     */
+    private readonly string $favicon;
+
+    /**
+     * Life time of session (in seconds)
+     */
+    private readonly int $sessionLifetime;
+
+    /**
      * Creates new configuration of application.
      * @param DateTimeFormat $dateTimeFormat Format of date and time used in application.
      * @param bool $phpErrors Flag, whether PHP errors should be displayed or not.
@@ -82,6 +92,8 @@ class Configuration
      * @param RouterModel $routes Model of router of application.
      * @param string $timezone Default time zone of application.
      * @param CountersModel $countersModel Model of counters of application.
+     * @param string $favicon Path to favicon of application.
+     * @param int $sessionLifetime Life time of session (in seconds).
      */
     public function __construct(
         DateTimeFormat $dateTimeFormat,
@@ -91,7 +103,9 @@ class Configuration
         SourcesModel $sourcesModel,
         RouterModel $routes,
         string $timezone,
-        CountersModel $countersModel)
+        CountersModel $countersModel,
+        string $favicon,
+        int $sessionLifetime)
     {
         $this->dateTimeFormat = $dateTimeFormat;
         $this->phpErrors = $phpErrors;
@@ -101,6 +115,8 @@ class Configuration
         $this->routes = $routes;
         $this->timezone = $timezone;
         $this->countersModel = $countersModel;
+        $this->favicon = $favicon;
+        $this->sessionLifetime = $sessionLifetime;
     }
 
     /**
@@ -174,6 +190,24 @@ class Configuration
     public function getCountersModel(): CountersModel
     {
         return $this->countersModel;
+    }
+
+    /**
+     * Gets path to favicon of application.
+     * @return string Path to favicon of application.
+     */
+    public function getFavicon(): string
+    {
+        return $this->favicon;
+    }
+
+    /**
+     * Gets life time of session (in seconds).
+     * @return int Life time of session (in seconds).
+     */
+    public function getSessionLifetime(): int
+    {
+        return $this->sessionLifetime;
     }
 }
 

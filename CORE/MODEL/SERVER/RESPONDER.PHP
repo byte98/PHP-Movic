@@ -38,11 +38,25 @@ class Responder
         $this->handleCookies($response);
         $this->handleHeaders($response);
         http_response_code($response->getResponseCode()->value);
+        $this->handleClean($response);
         $this->handleViews($response);
         Application::logger()->log(
             Responder::getLevelFromStatus($response->getResponseCode()),
             "Response (#" . $response->getNumber() . " to " . $response->getAddress() . "): " . $response->getResponseCode()->toString() .
             " (in " . DateUtils::elapsed($response->getRequestTime(), DateUtils::now()) . ")");
+    }
+
+    /**
+     * Handles cleaning of output buffer.
+     * @param response $response Response defining actions with cleaning.
+     */
+    private function handleClean(Response $response): void
+    {
+        if ($response->getClean() == true)
+        {
+            ob_clean();
+            flush();
+        }
     }
 
     /**
@@ -89,7 +103,6 @@ class Responder
             $c++;
         }
         Application::logger()->debug("Response (#" . $response->getNumber() . " to " . $response->getAddress() . "): " . $c . " session variables set");
-
     }
 
     /**

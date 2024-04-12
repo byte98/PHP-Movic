@@ -33,11 +33,11 @@ abstract class PathUtils
      */
     public static function isAbsolute(string $path): bool
     {
-        $reti = true;
-        if (str_starts_with($reti, DIRECTORY_SEPARATOR) == false && preg_match('/^[a-zA-Z]:/', $reti) == false)
+        $reti = false;
+        if (str_starts_with($path, DIRECTORY_SEPARATOR) || preg_match('/^[a-zA-Z]:/', $path))
         {
-            // Path does not start with / or C:/ (script assumes that path is relative)
-            $reti = false;
+            // Path starts with / or C:/ (script assumes that path is absolute)
+            $reti = true;
         }
         return $reti;
     }

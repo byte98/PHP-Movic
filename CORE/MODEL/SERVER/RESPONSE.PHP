@@ -73,6 +73,12 @@ class Response
     private readonly string $address;
 
     /**
+     * Flag, whether output buffer should be cleaned.
+     */
+    private bool $clean;
+
+
+    /**
      * Creates new response.
      * @param array $cookies Array with set cookies.
      * @param array $session Data in actual session.
@@ -90,6 +96,7 @@ class Response
         $this->number = $number;
         $this->requestTime = $requestTime;
         $this->flushSession = false;
+        $this->clean = false;
         $this->address = $address;
     }
 
@@ -243,6 +250,24 @@ class Response
     public function getAddress(): string
     {
         return $this->address;
+    }
+
+    /**
+     * Cleans output buffer.
+     */
+    public function clean(): void
+    {
+        $this->clean = true;
+    }
+
+    /**
+     * Checks, whether output buffer should be cleaned.
+     * @return bool TRUE if output buffer should be cleaned,
+     *              FALSE otherwise.
+     */
+    public function getClean(): bool
+    {
+        return $this->clean;
     }
 }
 

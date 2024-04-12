@@ -60,7 +60,12 @@ class StaticController extends ControllerAdapter
             $path = $this->root . $file;
             if (file_exists($path))
             {
+                $reti->setHeader("Content-Type", mime_content_type($path));
                 $reti->addView(new FileView($path));
+                $reti->setHeader("Content-Length", filesize($path));
+                $reti->setHeader("Content-Disposition", "attachment; filename=" . $file);
+                $reti->setheader("Pragma", " public");
+                $reti->clean();
             }
             else
             {

@@ -71,8 +71,40 @@ class ConfigurationLoader
             $this->getSourcesModel($data),
             $this->getRouterModel($data),
             $this->getTimeZone($data),
-            $this->getCountersModel($data)
+            $this->getCountersModel($data),
+            $this->getFavicon($data),
+            $this->getSessionLifetime($data)
         );
+    }
+
+    /**
+     * Gets life time of session (in seconds).
+     * @param array $data Parsed configuration data.
+     * @return int Life time of session (in seconds).
+     */
+    private function getSessionLifetime(array $data): int
+    {
+        $reti = 60;
+        if ($this->checkValue($data, "SessionLifetime", "integer"))
+        {
+            $reti = $data["SessionLifetime"];
+        }
+        return $reti;
+    }
+
+    /**
+     * Gets path to favicon from parsed configuration file.
+     * @param array $data Parsed configuration data.
+     * @return string Path to favicon.
+     */
+    private function getFavicon(array $data): string
+    {
+        $reti = "";
+        if ($this->checkValue($data, "Favicon", "string"))
+        {
+            $reti = $data["Favicon"];
+        }
+        return $reti;
     }
 
     /**
@@ -163,6 +195,7 @@ class ConfigurationLoader
         $formatString = "";
         $useFormat = false;
         $console = false;
+        $sourceLoader = false;
         if ($this->checkValue($data, "LogLevel", "string"))
         {
             $level = LogLevel::fromStringOrDefined($data["LogLevel"], $level);
@@ -173,7 +206,7 @@ class ConfigurationLoader
         if ($this->checkValue($data, "LogUseFormat", "boolean")) $useFormat = $data["LogUseFormat"];
         if ($this->checkValue($data, "LogFormat", "string")) $formatString = $data["LogFormat"];
         if ($this->checkValue($data, "LogConsole", "boolean")) $console = $data["LogConsole"];
-        
+        if ($this->checkValue($data, "LogSourceLoader", "boolean")) $sourceLoader = $data["LogSourceLoader"];
         $debugFormatString = $formatString;
         $lowFormatString = $formatString;
         $baseFormatString = $formatString;
@@ -212,6 +245,7 @@ class ConfigurationLoader
             $stdout,
             $useFormat,
             $console,
+            $sourceLoader,
             $this->parseLogFormat($formatString),
             $this->parseLogFormat($debugFormatString),
             $this->parseLogFormat($lowFormatString),
@@ -258,6 +292,7 @@ class ConfigurationLoader
     {
         $routes = array();
         $static = array();
+        $favicon = "";
         if ($this->checkValue($config, "Routes", "array"))
         {
             foreach($config["Routes"] as $key => $value)

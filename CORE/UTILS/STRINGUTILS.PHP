@@ -105,6 +105,41 @@ abstract class StringUtils
     {
         return strval(intval($number));
     }
+
+    /**
+     * Shortens string.
+     * @param string $str String to shorten.
+     * @param int $length Desired length of returned string.
+     * @param string $end End of returned string (length of end is included in desired length).
+     * @return string Shortened string.
+     */
+    public static function shorten(string $str, int $length, string $end = "..."): string
+    {
+        $reti = $str;
+        $maxLength = $length - strlen($end);
+        if (strlen($str) > $maxLength)
+        {
+            $reti = substr($str, 0, $maxLength) . $end;
+        }
+        return $reti;
+    }
+
+    /**
+     * Creates pseudo-random string.
+     * @param string $alphabet Alphabet to use.
+     * @param int $length Desired length of returned string.
+     * @return string Pseudo-random string.
+     */
+    public static function random(string $alphabet, int $length): string
+    {
+        $reti = "";
+        for ($i = 0; $i < $length; $i++)
+        {
+            $reti .= $alphabet[rand(0, strlen($alphabet) - 1)];
+        }
+        return $reti;
+    }
+
 }
 
 ?>

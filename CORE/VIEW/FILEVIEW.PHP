@@ -48,7 +48,7 @@ class FileView implements View
         Application::logger()->debug("File view: printing content of file '" . $this->file . "'");
         if (file_exists($this->file))
         {
-            echo file_get_contents($this->file);
+            readfile($this->file);
         }
         else
         {

@@ -29,6 +29,11 @@ use PHPMovic\Utils\DateUtils;
 class Request
 {
     /**
+     * Name of value in session where is stored timer of session lifetime.
+     */
+    private const SessionTimer = "__phpmovic_session_timer";
+
+    /**
      * Method used to execute request.
      */
     private readonly HttpMethod $method;
@@ -66,7 +71,7 @@ class Request
     /**
      * Data in actual session.
      */
-    private readonly array $session;
+    private array $session;
 
     /**
      * Number of request.
@@ -104,11 +109,11 @@ class Request
         $this->number = $counter->getValue();
         $counter->increment();
         $this->time = DateUtils::now();
-        unset($_REQUEST);
-        unset($_SESSION);
-        unset($_COOKIE);
-        unset($_POST);
-        unset($_GET);
+        $_REQUEST = array();
+        $_SESSION = array();
+        $_COOKIE = array();
+        $_POST = array();
+        $_GET = array();
     }
 
     /**
@@ -287,6 +292,72 @@ class Request
     {
         $reti = isset($_SERVER["HTTP_X_FORWARDED_FOR"]) ? $_SERVER["HTTP_X_FORWARDED_FOR"] : $_SERVER["REMOTE_ADDR"];
         return $reti;
+    }
+
+    /**
+     * Checks, whether value has been sent using request.
+     * @param string $name Name of value.
+     * @return bool TRUE if value has been sent,
+     *              FALSE otherwise.
+     */
+    public function containsValue(string $name): bool
+    {
+        return array_key_exists($name, $this->data);
+    }
+
+    /**
+     * Checks, whether session has expired. If so, deletes all data
+     * from session. Also updates actual timer in session.
+     * @param int $lifetime Lifetime of session (in seconds).
+     */
+    public function checkSession(int $lifetime): void
+    {
+        // Parse session timer.
+        // If no timer is set, use begin of epoch.
+        $sessionTime = new \DateTime("@0");
+        if (array_key_exists(Request::SessionTimer, $this->session) &&
+            $this->session[Request::SessionTimer] instanceof \DateTime)
+        {
+            $sessionTime = $this->session[Request::SessionTimer];
+        }
+
+        // Compute time, to when is session valid
+        $intervalString = "PT" . strval($lifetime) . "S";
+        $interval = new \DateInterval($intervalString);
+        $valid = new \DateTime("@" . $sessionTime->format("U"));
+        $valid = $valid->add($interval);
+
+        // Load current time
+        $now = DateUtils::now();
+
+        // Compare times
+        $expired = $now >= $valid;
+
+        // If session expired, delete all data
+        if ($expired)
+        {
+            $this->flushSession();
+            Application::logger()->info("Session expired");
+        }
+        else
+        {
+            Application::logger()->low("Session is valid for " . DateUtils::elapsed($now, $valid));
+        }
+        
+        // Update session timer.
+        $this->session[Request::SessionTimer] = $now;
+    }
+
+    /**
+     * Flushes all data in session.
+     */
+    private function flushSession(): void
+    {
+        foreach($this->session as $key => $value)
+        {
+            unset($this->data[$key]);
+        }
+        $this->session = array();
     }
 }
 

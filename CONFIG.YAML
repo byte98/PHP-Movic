@@ -43,6 +43,13 @@ PHPErrors: True
 # them in one place, all counters will be stored in one file.
 Counters: "COUNTERS.TXT"
 
+# Path to favicon of application.
+# This file will be sent when there is request for favicon of application.
+Favicon: "FAVICON.ICO"
+
+# Lifetime of session (in seconds)
+SessionLifetime: 5
+
 # Namespace of all user content. All classes in /CONTENT folder
 # are expected to be in this namespace.
 # Example: assuming ContentNamespace is "MyApp"
@@ -102,6 +109,15 @@ LogLevelFormat:
 #
 # Note: this setting is also affected by LogUseFormat.
 LogConsole: True
+
+# Flag, whether source loader of classes should also produce logs.
+# Allowed values:
+#    True: source loader will produce logs
+#    False: source loader will NOT produce logs
+# 
+# Note: Source loader could potentially produce large amount
+# of logs, depending on amount of classes in application.
+LogSourceLoader: False
 
 # Name of class which provides connection to the database. This is
 # expected to be any class, which has source code within /DRIVERS

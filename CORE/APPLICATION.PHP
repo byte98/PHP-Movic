@@ -82,7 +82,7 @@ class Application
     /**
      * Loader of addons.
      */
-    private readonly AddonLoader $addonLoader;
+    private static ?AddonLoader $addonLoader;
 
     /**
      * Creates new instance of application.
@@ -95,12 +95,12 @@ class Application
         $this->configuration = $configuration;
         Application::$logger = new Logger($configuration->getLogModel(), $configuration->getDateTimeFormat());
         Application::$countersManager = new CountersManager($this->configuration->getCountersModel());
-        Application::$sourceLoader = new SourceLoader($configuration->getSourcesModel());
+        Application::$sourceLoader = new SourceLoader($configuration->getSourcesModel(), $this->configuration->getLogModel()->getSourceLoader());
         $this->changeAutoloader();
         $this->router = new Router($this->configuration);
         $this->responder = new Responder();
         Application::$databaseManager = new DatabaseManager($this->configuration->getConnectionModel());
-        $this->addonLoader = new AddonLoader($_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "ADDONS");
+        Application::$addonLoader = new AddonLoader($_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "ADDONS");
         $this->init();
     }
 
@@ -133,7 +133,7 @@ class Application
         SimpleView::setRoot($this->configuration->getSourcesModel()->getUserNamespace());
 
         // Load addons
-        $this->addonLoader->loadAll();
+        Application::$addonLoader->loadAll();
 
         Application::logger()->low("Application loaded in " . DateUtils::elapsed($this->bootloader->getStart(), DateUtils::now())); 
 
@@ -146,6 +146,7 @@ class Application
     public function run(Request $request): void
     {
         Application::logger()->base("Incoming request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): " . $request->getResource());
+        $request->checkSession($this->configuration->getSessionLifetime());
         $route = $this->router->route($request->getResource());
         if ($route != null)
         {
@@ -176,7 +177,7 @@ class Application
         {
             Application::logger()->warning("Request cannot be handled: no route defined for '" . $request->getResource() . "'!");
         }
-        $this->addonLoader->stopAll();
+        Application::$addonLoader->stopAll();
         Application::$databaseManager->closeAll();
         Application::logger()->low("Application finished in " . DateUtils::elapsed($this->bootloader->getStart(), DateUtils::now()));
     }
@@ -225,6 +226,17 @@ class Application
     {
         $reti = Application::$databaseManager->get();
         return $reti;
+    }
+
+    /**
+     * Checks, whether given addon is loaded.
+     * @param string $addonClass Fully qualified name of addon class.
+     * @return bool TRUE, if addon is loaded,
+     *              FALSE otherwise.
+     */
+    public static function isAddonLoaded(string $addonClass): bool
+    {
+        return Application::$addonLoader->isAddonLoadded($addonClass);
     }
 }
 

@@ -40,6 +40,11 @@ enum DatabaseType
     case Text;
 
     /**
+     * Date and/or time data type.
+     */
+    case Date;
+
+    /**
      * Foreign key referencing to other object.
      */
     case Reference;

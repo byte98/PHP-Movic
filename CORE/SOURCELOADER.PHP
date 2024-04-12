@@ -18,6 +18,7 @@
 // 
 
 namespace PHPMovic;
+use PHPMovic\Application;
 use PHPMovic\Model\Configuration\SourcesModel;
 
 /**
@@ -36,13 +37,20 @@ class SourceLoader
     private readonly SourcesModel $sourcesModel;
 
     /**
+     * Flag, whether source loader should produce logs.
+     */
+    private readonly bool $log;
+
+    /**
      * Creates new loader of source files.
      * @param SourcesModel $sourcesModel Model of all sources of application.
+     * @param bool $log Flag, whether source loader should produce logs.
      */
-    public function __construct(SourcesModel $sourcesModel)
+    public function __construct(SourcesModel $sourcesModel, bool $log)
     {
         $this->cache = array();
         $this->sourcesModel = $sourcesModel;
+        $this->log = $log;
     }
 
     /**
@@ -52,15 +60,36 @@ class SourceLoader
     public function includeSource(string $className): void
     {
         $path = $this->getSourcePath($className);
-        //echo $className . " => " . $path . "<hr>";
+        if ($this->loggerAvailable() && $this->log == true)
+        {
+            Application::logger()->debug("Loading class '" . $className . "' from '" . $path . "'");
+        }
         if (file_exists($path))
         {
-            include($path);
+            require($path);
+            if ($this->loggerAvailable() && $this->log == true)
+            {
+                Application::logger()->debug("Class '" . $className . "' (path: '" . $path . "') loaded");
+            }
         }
         else
         {
             Application::logger()->warning("Cannot load class '" . $className . "' (path: '" . $path . "'): file not found!");
         }
+    }
+
+    /**
+     * Checks, whether logger is available.
+     * @return bool TRUE if logger is available, FALSE otherwise.
+     */
+    private function loggerAvailable(): bool
+    {
+        return (
+            class_exists(\PHPMovic\Application::class) == true &&
+            class_exists(\PHPMovic\Utils\Log\Logger::class) == true &&
+            class_exists(\PHPMovic\Utils\Log\Log::class) == true &&
+            class_exists(\PHPMovic\Utils\Log\LogLevel::class) == true
+        );
     }
 
     /**

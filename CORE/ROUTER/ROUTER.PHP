@@ -20,6 +20,7 @@
 namespace PHPMovic\Router;
 
 use PHPMovic\Application;
+use PHPMovic\Controller\FileController;
 use PHPMovic\Controller\StaticController;
 use PHPMovic\Router\Route;
 use PHPMovic\Model\Configuration\Configuration;
@@ -50,9 +51,29 @@ class Router
         $this->routes = array();
         $counter = Application::counters()->create("ROUTES");
         $counter->reset();
+        $this->createFaviconRoute();
         $this->buildRoutingTable();
         $this->buildStaticRoutes();
         Application::logger()->info("Routing table contains " . count($this->routes) . " routes.");
+    }
+
+
+    /**
+     * Creates route for favicon.
+     */
+    private function createFaviconRoute(): void
+    {
+        Application::logger()->debug("Creating route for favicon");
+        $controller = new FileController($this->configuration->getFavicon(), "favicon.ico");
+        $route = Route::createFromController("/favicon.ico", $controller);
+        if ($route == null)
+        {
+            Application::logger()->warning("Favicon route could not be created.");
+        }
+        else
+        {
+            array_push($this->routes, $route);
+        }
     }
 
     /**

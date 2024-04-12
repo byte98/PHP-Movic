@@ -65,6 +65,11 @@ class LogModel
     private readonly bool $fileUseFormat;
 
     /**
+     * Flag, whether source loader should also produce logs.
+     */
+    private readonly bool $sourceLoader;
+
+    /**
      * Creates new model of logs and its formats.
      * @param LogLevel $level Minimal level of logs to be saved.
      * @param bool $doLogs Flag, whether application should make logs.
@@ -73,6 +78,7 @@ class LogModel
      * @param bool $fileUseFormat Flag, whether styling should be used also for
      *                            logs saved into file.
      * @param bool $console Flag, whether logs should be also printed to browser console.
+     * @param bool $sourceLoader Flag, whether source loader should also produce logs.
      * @param LogFormat $format Format of logs.
      * @param LogFormat $formatDebug Format of logs at level Debug.
      * @param LogFormat $formatLow Format of logs at level Low.
@@ -90,6 +96,7 @@ class LogModel
         bool $stdout,
         bool $fileUseFormat,
         bool $console,
+        bool $sourceLoader,
         LogFormat $format,
         ?LogFormat $formatDebug = null,
         ?LogFormat $formatLow = null,
@@ -124,6 +131,7 @@ class LogModel
         $this->stdout = $stdout;
         $this->fileUseFormat = $fileUseFormat;
         $this->console = $console;
+        $this->sourceLoader = $sourceLoader;
     }
 
     /**
@@ -190,6 +198,15 @@ class LogModel
     public function getConsole(): bool
     {
         return $this->console;
+    }
+
+    /**
+     * Gets flag, whether source loader should also produce logs.
+     * @return bool Flag, whether source loader should also produce logs.
+     */
+    public function getSourceLoader(): bool
+    {
+        return $this->sourceLoader;
     }
 }
 

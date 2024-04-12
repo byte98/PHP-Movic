@@ -39,6 +39,16 @@ class AddonLoader
     private array $addons;
 
     /**
+     * Buffer with names of loaded classes.
+     */
+    private array $classBuffer;
+
+    /**
+     * Array with successfully loaded classes of addons.
+     */
+    private array $loadedClasses;
+
+    /**
      * Creates new loader of addons.
      * @param string $path Path to folder with addons.
      */
@@ -50,6 +60,8 @@ class AddonLoader
         }
         $this->path = $path;
         $this->addons = array();
+        $this->classBuffer = array();
+        $this->loadedClasses = array();
     }
 
     /**
@@ -57,6 +69,7 @@ class AddonLoader
      */
     public function loadAll(): void
     {
+        $this->loadedClasses = array();
         $path_to_folder = $this->path;
         $contents = scandir($path_to_folder);
         $child_folders = array_filter($contents, function($item) use ($path_to_folder) {
@@ -147,27 +160,29 @@ class AddonLoader
                     }
                 }
             }
+            $config = array();
             if (file_exists($configFile))
             {
+                Application::logger()->low("Loading configuration file '" . $configFile . "'");
                 $config = \yaml_parse_file($configFile);
                 if ($config == null)
                 {
                     $config = array();
                 }
-                Application::logger()->low("Loading configuration file '" . $configFile . "'");
-                $res = $addon->init($config);
-                if ($res == false)
-                {
-                    Application::logger()->error("Loading of addon '" . $info->getName() . "' failed!");
-                }
-                else
-                {
-                    Application::logger()->success("Addon '" . $info->getName() . "' has been loaded (in " . DateUtils::elapsed($start, DateUtils::now()) . ")");
-                }
             }
             else
             {
                 Application::logger()->warning("Cannot load configuration of addon '" . $info->getName() . "': file '" . $configFile . "' does not exist!");
+            }
+            $res = $addon->init($config);
+            if ($res == false)
+            {
+                Application::logger()->error("Loading of addon '" . $info->getName() . "' failed!");
+            }
+            else
+            {
+                array_push($this->loadedClasses, $className);
+                Application::logger()->success("Addon '" . $info->getName() . "' has been loaded (in " . DateUtils::elapsed($start, DateUtils::now()) . ")");
             }
         }
     }
@@ -204,8 +219,10 @@ class AddonLoader
 
         // Check each declared class if it implements the interface
         foreach ($declaredClasses as $className) {
-            if ($this->classImplementsInterface($className, $interfaceName)) {
-                $classes[] = $className;
+            if ($this->classImplementsInterface($className, $interfaceName) && in_array($className, $this->classBuffer) == false)
+            {
+                array_push($classes, $className);
+                array_push($this->classBuffer, $className);
             }
         }
 
@@ -232,6 +249,17 @@ class AddonLoader
             }
             
         }
+    }
+
+    /**
+     * Checks, whether addon is loaded.
+     * @param string $addonClass Name of addon class.
+     * @return bool TRUE if addon is loaded,
+     *             FALSE otherwise.
+     */
+    public function isAddonLoadded(string $addonClass): bool
+    {
+        return in_array($addonClass, $this->loadedClasses);
     }
 }
 

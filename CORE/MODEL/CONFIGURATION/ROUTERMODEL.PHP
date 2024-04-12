@@ -33,7 +33,6 @@ class RouterModel
      * Array with all static routes from configuration.
      */
     private readonly array $staticRoutes;
-
     /**
      * Creates new model of router.
      * @param array $routes Array with all routes from configuration.
