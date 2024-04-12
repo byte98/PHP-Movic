@@ -52,7 +52,7 @@ abstract class PathUtils
         $reti = $path;
         if (PathUtils::isAbsolute($reti) == false)
         {
-            $reti = realpath($_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . $path);
+            $reti = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . $path;
         }
         return $reti;
     }
