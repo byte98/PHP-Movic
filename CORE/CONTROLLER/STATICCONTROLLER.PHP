@@ -57,7 +57,19 @@ class StaticController extends ControllerAdapter
         $file = $request->getValue("FILE");
         if ($file != null)
         {
+            $check = array();
+            array_push($check, $this->root . $file);
+            array_push($check, $this->root . strtoupper($file));
+            array_push($check, $this->root . strtolower($file));
             $path = $this->root . $file;
+            foreach($check as $c)
+            {
+                if (file_exists($c))
+                {
+                    $path = $c;
+                    break;
+                }
+            }
             if (file_exists($path))
             {
                 $reti->setHeader("Content-Type", mime_content_type($path));
