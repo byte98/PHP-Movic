@@ -28,14 +28,22 @@ class JsonView implements View
 {
 
     /**
-     * Location of data passed to the view, which will be
-     * encoded to JSON format.
+     * Data which will be returned.
      */
-    public const DataLocation = "__json";
+    private readonly mixed $jsonData;
+    
+    /**
+     * Creates new view which just prints JSON data.
+     * @param mixed $jsonData Data which will be printed.
+     */
+    public function __construct(mixed $jsonData)
+    {
+        $this->jsonData = $jsonData;
+    }
 
     public function render($data)
     {
-        echo(json_encode($data(JsonView::DataLocation)));
+        echo(json_encode($this->jsonData));
     }
 }
 
