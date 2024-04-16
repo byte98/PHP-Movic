@@ -27,9 +27,15 @@ use PHPMovic\View;
 class JsonView implements View
 {
 
+    /**
+     * Location of data passed to the view, which will be
+     * encoded to JSON format.
+     */
+    public const DataLocation = "__json";
+
     public function render($data)
     {
-        echo(json_encode($data));
+        echo(json_encode($data(JsonView::DataLocation)));
     }
 }
 
