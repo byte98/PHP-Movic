@@ -19,7 +19,7 @@
 
 namespace PHPMovic\View;
 
-use PHPMovic\View;
+use PHPMovic\View\View;
 
 /**
  * Class which represents view, which just prints JSON data.
