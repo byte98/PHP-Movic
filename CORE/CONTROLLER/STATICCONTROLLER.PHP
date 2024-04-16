@@ -24,9 +24,8 @@ use PHPMovic\Controller\ControllerAdapter;
 use PHPMovic\Model\MimeType;
 use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\Response;
-use PHPMovic\Controller\Controller;
 use PHPMovic\Model\Server\HttpStatus;
-use PHPMovic\Utils\PathUtils;
+use PHPMovic\Model\MimeType;
 use PHPMovic\View\FileView;
 
 /**
