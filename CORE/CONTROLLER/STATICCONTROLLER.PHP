@@ -25,7 +25,6 @@ use PHPMovic\Model\MimeType;
 use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\Response;
 use PHPMovic\Model\Server\HttpStatus;
-use PHPMovic\Model\MimeType;
 use PHPMovic\View\FileView;
 
 /**

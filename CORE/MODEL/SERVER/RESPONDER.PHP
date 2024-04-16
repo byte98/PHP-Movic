@@ -36,6 +36,7 @@ class Responder
     {
         $this->handleSession($response);
         $this->handleCookies($response);
+        $this->handleMime($response);
         $this->handleHeaders($response);
         http_response_code($response->getResponseCode()->value);
         $this->handleClean($response);
