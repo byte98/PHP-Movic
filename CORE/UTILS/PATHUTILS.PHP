@@ -56,6 +56,22 @@ abstract class PathUtils
         }
         return $reti;
     }
+
+    /**
+     * Gets extension from path to file.
+     * @param string $path Path to file which extension will be returned.
+     * @return string Extension of file from given path.
+     */
+    public static function getExtension(string $path): string
+    {
+        $reti = "";
+        if (strrpos($path, ".") !== false)
+        {
+            $reti = substr($path, strrpos($path, ".") + 1);
+            $reti = "." . $reti;
+        }
+        return $reti;
+    }
 }
 
 ?>

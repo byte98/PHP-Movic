@@ -21,6 +21,7 @@ namespace PHPMovic\Controller;
 
 use PHPMovic\Application;
 use PHPMovic\Controller\ControllerAdapter;
+use PHPMovic\Model\MimeType;
 use PHPMovic\Model\Server\Request;
 use PHPMovic\Model\Server\Response;
 use PHPMovic\Controller\Controller;
@@ -72,7 +73,7 @@ class StaticController extends ControllerAdapter
             }
             if (file_exists($path))
             {
-                $reti->setHeader("Content-Type", mime_content_type($path));
+                $reti->setMIME(MimeType::fromPath($path));
                 $reti->addView(new FileView($path));
                 $reti->setHeader("Content-Length", filesize($path));
                 $reti->setHeader("Content-Disposition", "attachment; filename=" . $file);

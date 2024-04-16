@@ -19,6 +19,7 @@
 
 namespace PHPMovic\Model\Server;
 
+use PHPMovic\Model\MimeType;
 use PHPMovic\View\View;
 use PHPMovic\Model\Server\HttpStatus;
 
@@ -77,6 +78,10 @@ class Response
      */
     private bool $clean;
 
+    /**
+     * MIME type of content of response.
+     */
+    private MimeType $mimeType;
 
     /**
      * Creates new response.
@@ -98,6 +103,7 @@ class Response
         $this->flushSession = false;
         $this->clean = false;
         $this->address = $address;
+        $this->mimeType = MimeType::html;
     }
 
     /**
@@ -268,6 +274,24 @@ class Response
     public function getClean(): bool
     {
         return $this->clean;
+    }
+
+    /**
+     * Sets MIME type of response.
+     * @param MimeType $mimeType New MIME type of response.
+     */
+    public function setMIME(MimeType $mimeType): void
+    {
+        $this->mimeType = $mimeType;
+    }
+
+    /**
+     * Gets MIME type of response.
+     * @return MimeType MIME type of response.
+     */
+    public function getMIME(): MimeType
+    {
+        return $this->mimeType;
     }
 }
 

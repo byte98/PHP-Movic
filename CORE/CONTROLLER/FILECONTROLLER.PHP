@@ -65,7 +65,7 @@ class FileController extends ControllerAdapter
         if (file_exists($this->path))
         {
             $reti->addView($this->view);
-            $reti->setHeader("Content-Type", mime_content_type($this->path));
+            $reti->setMIME(MimeType::fromPath($path));
             $reti->setHeader("Content-Length", filesize($this->path));
             $reti->setHeader("Content-Disposition", "attachment; filename=" . $this->responseName);
             $reti->setheader("Pragma", " public");

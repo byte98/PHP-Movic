@@ -150,10 +150,23 @@ class Responder
         $counter = 0;
         foreach($response->getHeaders() as $key => $value)
         {
-            header($key . ": " . $value);
-            $counter++;
+            if ($key != "Content-Type") // Do NOT set Content-Type,
+            {                           // it is defined by MIME type.
+                header($key . ": " . $value);
+                $counter++;
+            }
         }
         Application::logger()->debug("Response (#" . $response->getNumber() . " to " . $response->getAddress() . "): " . $counter . " headers set");
+    }
+
+    /**
+     * Handles MIME type of response.
+     * @param response $response Response which MIME type should be handled.
+     */
+    private function handleMime(Response $response): void
+    {
+        header("Content-Type: " . $response->getMIME()->toString());
+        Application::logger()->debug("Response (#" . $response->getNumber() . " to " . $response->getAddress() . "): Content-Type set to " . $response->getMIME()->toString());
     }
 
     /**
