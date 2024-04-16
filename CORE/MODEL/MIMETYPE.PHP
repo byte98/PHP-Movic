@@ -4131,25 +4131,7 @@ enum MimeType
         }
         return $reti;
     }
-
-    /**
-     * Gets MIME type from its string representation.
-     * @param string $string String representation of MIME type.
-     * @return MimeType Parsed MIME type,
-     *                  or octet_stream type if parsing failed.
-     */
-    public static function fromString(string $string): MimeType
-    {
-        $reti = MimeType::octet_stream;
-        $input = strtolower(StringUtils::trim($string));
-        switch($input)
-        {
-            
-            default: $reti = MimeType::octet_stream; break;
-        }
-        return $reti;
-    }
-
+    
     /**
      * Gets MIME type from file extension.
      * @param string $extension Extension of file.
