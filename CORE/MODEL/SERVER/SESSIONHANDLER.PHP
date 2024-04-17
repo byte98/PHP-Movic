@@ -69,6 +69,16 @@ class SessionHandler
     private int $retry;
 
     /**
+     * IP address of session.
+     */
+    private string $ip;
+
+    /**
+     * Flag, whether session IP matches previous one.
+     */
+    private bool $matches;
+
+    /**
      * Creates new session handler.
      * @param array $data Data stored in session.
      * @param SessionModel $config Configuration of session.
@@ -83,7 +93,9 @@ class SessionHandler
         $this->parseData();
         $this->output = null;
         $this->limitExceeded = false;
+        $this->ip = "localhost";
         $this->retry = 0;
+        $this->matches = false;
     }
 
     /**
@@ -105,12 +117,17 @@ class SessionHandler
         {
             $this->requests = $this->data[SessionModel::SessionRequests];
         }
+        if (ArrayUtils::checkValue($this->data, SessionModel::SessionIP, "string"))
+        {
+            $this->ip = $this->data[SessionModel::SessionIP];
+        }
     }
 
     /**
      * Checks session for validity.
+     * @param string $ip IP address of session.
      */
-    private function checkSession(): void
+    private function checkSession(string $ip): void
     {
         $this->retry = 0;
         $this->limitExceeded = false;
@@ -122,21 +139,42 @@ class SessionHandler
         else
         {
             Application::logger()->low("Session is valid for " . DateUtils::elapsed(DateUtils::now(), $expiration));
-            $this->checkTimeFrame();
-            $this->copyData();
-            $this->requests++;
-            if ($this->config->getReqCount() >= $this->requests)
+            if ($this->config->getMatchIP() == false || ($this->config->getMatchIP() == true && $ip == $this->ip))
             {
-                Application::logger()->debug("Request can fit in actual session time frame (actual:" . $this->requests . ", limit:" . $this->config->getReqCount() . ")");
-                $this->limitExceeded = false;
+                $this->matches = true;
+                $this->checkTimeFrame();
+                $this->copyData();
+                $this->requests++;
+                if ($this->config->getReqCount() >= $this->requests)
+                {
+                    Application::logger()->debug("Request can fit in actual session time frame (actual:" . $this->requests . ", limit:" . $this->config->getReqCount() . ")");
+                    $this->limitExceeded = false;
+                }
+                else
+                {
+                    Application::logger()->debug("Request is out of actual time frame (actual:" . $this->requests . ", limit:" . $this->config->getReqCount() . ")");
+                    $this->limitExceeded = true;
+                }
             }
             else
             {
-                Application::logger()->debug("Request is out of actual time frame (actual:" . $this->requests . ", limit:" . $this->config->getReqCount() . ")");
-                $this->limitExceeded = true;
+                $this->matches = false;
+                $this->ip = $ip;
+                Application::logger()->warning("Session IP address has changed");
             }
+            
         }
         $this->saveSessionInfo();
+    }
+
+    /**
+     * Checks, whether session matches previous IP address.
+     * @return bool TRUE if session matches previous IP address,
+     *              FALSE otherwise.
+     */
+    public function IPMatches(): bool
+    {
+        return $this->matches;
     }
 
     /**
@@ -185,7 +223,7 @@ class SessionHandler
         $this->output = array();
         foreach($this->data as $key => $value)
         {
-            if ($key != SessionModel::SessionTimer && $key != SessionModel::SessionTimeFrame && $key != SessionModel::SessionRequests)
+            if ($key != SessionModel::SessionTimer && $key != SessionModel::SessionTimeFrame && $key != SessionModel::SessionRequests && $key != SessionModel::SessionIP)
             {
                 $this->output[$key] = $value;
             }
@@ -204,6 +242,7 @@ class SessionHandler
         $this->output[SessionModel::SessionTimer] = DateUtils::now();
         $this->output[SessionModel::SessionTimeFrame] = $this->frame;
         $this->output[SessionModel::SessionRequests] = $this->requests;
+        $this->output[SessionModel::SessionIP] = $this->ip;
     }
 
     /**
@@ -233,14 +272,15 @@ class SessionHandler
 
     /**
      * Gets data from session with checking of session lifetime.
+     * @param string $ip IP address of actual request.
      * @return array Data from session.
      */
-    public function getData(): array
+    public function getData(string $ip): array
     {
         if ($this->output === null)
         {
             Application::logger()->debug("Session data is null - checking session");
-            $this->checkSession();
+            $this->checkSession($ip);
         }
         else
         {

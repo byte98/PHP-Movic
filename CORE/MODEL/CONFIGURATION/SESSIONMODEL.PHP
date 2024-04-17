@@ -42,6 +42,11 @@ class SessionModel
     public const SessionRequests = "__phpmovic_session_requests";
 
     /**
+     * Name of variable in session data, where IP address is stored.
+     */
+    public const SessionIP = "__phpmovic_session_address";
+
+    /**
      * Timeout of session (in seconds).
      */
     private readonly int $timeout;

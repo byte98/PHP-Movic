@@ -324,7 +324,7 @@ class Request
         $reti = false;
         $handler = new SessionHandler($this->session, $model);
         $this->flushSession();
-        $this->session = $handler->getData();
+        $this->session = $handler->getData($this->getAddress());
         $this->data = array_merge($this->data, $this->session);
         if ($handler->exceededLimit() == true)
         {
