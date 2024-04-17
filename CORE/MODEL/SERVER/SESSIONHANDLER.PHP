@@ -90,10 +90,10 @@ class SessionHandler
         $this->timer = DateUtils::now();
         $this->frame = DateUtils::now();
         $this->requests = 0;
+        $this->ip = "localhost";
         $this->parseData();
         $this->output = null;
         $this->limitExceeded = false;
-        $this->ip = "localhost";
         $this->retry = 0;
         $this->matches = false;
     }
@@ -121,6 +121,10 @@ class SessionHandler
         {
             $this->ip = $this->data[SessionModel::SessionIP];
         }
+        else
+        {
+            Application::logger()->warning("Session IP address is missing");
+        }
     }
 
     /**
@@ -139,7 +143,25 @@ class SessionHandler
         else
         {
             Application::logger()->low("Session is valid for " . DateUtils::elapsed(DateUtils::now(), $expiration));
-            if ($this->config->getMatchIP() == false || ($this->config->getMatchIP() == true && $ip == $this->ip))
+            $ipOK = false;
+            if ($this->config->getMatchIP() == true)
+            {
+                if ($ip == $this->ip)
+                {
+                    $ipOK = true;
+                    Application::logger()->debug("Session IP addresses does match - check OK ('" . $ip . "' equals '" . $this->ip . "')");
+                }
+                else
+                {
+                    Application::logger()->debug("Session IP addresses does not match - check failed ('" . $ip . "' does not equals '" . $this->ip . "')");
+                }
+            }
+            else
+            {
+                Application::logger()->debug("Same IP address is not neccessary - check skipped");
+                $ipOK = true;
+            }
+            if ($ipOK)
             {
                 $this->matches = true;
                 $this->checkTimeFrame();
@@ -159,8 +181,8 @@ class SessionHandler
             else
             {
                 $this->matches = false;
+                Application::logger()->warning("Session IP address has changed ('" . $this->ip . "' -> '" . $ip . "')");
                 $this->ip = $ip;
-                Application::logger()->warning("Session IP address has changed");
             }
             
         }
