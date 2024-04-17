@@ -20,6 +20,7 @@
 namespace PHPMovic\Model\Server;
 
 use PHPMovic\Application;
+use PHPMovic\Model\Configuration\SessionModel;
 use PHPMovic\Model\Server\HttpMethod;
 use PHPMovic\Utils\DateUtils;
 
@@ -82,6 +83,7 @@ class Request
      * Time of request handling start.
      */
     private readonly \DateTime $time;
+
 
     /**
      * Creates new object representing request from
@@ -306,46 +308,28 @@ class Request
     }
 
     /**
-     * Checks, whether session has expired. If so, deletes all data
-     * from session. Also updates actual timer in session.
-     * @param int $lifetime Lifetime of session (in seconds).
+     * Checks session, whether is valid or not.
+     * @param SessionModel $model Configuration of session.
+     * @return bool TRUE if request (in which is session saved) can be handled
+     *              (aka can fit into current time frame),
+     *              FALSE otherwise.
      */
-    public function checkSession(int $lifetime): void
+    public function checkSession(SessionModel $model): bool
     {
-        // Parse session timer.
-        // If no timer is set, use begin of epoch.
-        $sessionTime = new \DateTime("@0");
-        if (array_key_exists(Request::SessionTimer, $this->session) &&
-            $this->session[Request::SessionTimer] instanceof \DateTime)
+        $reti = false;
+        $handler = new SessionHandler($this->session, $model);
+        $this->flushSession();
+        $this->session = $handler->getData();
+        $this->data = array_merge($this->data, $this->session);
+        if ($handler->exceededLimit() == true)
         {
-            $sessionTime = $this->session[Request::SessionTimer];
-        }
-
-        // Compute time, to when is session valid
-        $intervalString = "PT" . strval($lifetime) . "S";
-        $interval = new \DateInterval($intervalString);
-        $valid = new \DateTime("@" . $sessionTime->format("U"));
-        $valid = $valid->add($interval);
-
-        // Load current time
-        $now = DateUtils::now();
-
-        // Compare times
-        $expired = $now >= $valid;
-
-        // If session expired, delete all data
-        if ($expired)
-        {
-            $this->flushSession();
-            Application::logger()->info("Session expired");
+            $reti = false;
         }
         else
         {
-            Application::logger()->low("Session is valid for " . DateUtils::elapsed($now, $valid));
+            $reti = true;
         }
-        
-        // Update session timer.
-        $this->session[Request::SessionTimer] = $now;
+        return $reti;
     }
 
     /**

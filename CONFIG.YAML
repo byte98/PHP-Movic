@@ -47,9 +47,6 @@ Counters: "COUNTERS.TXT"
 # This file will be sent when there is request for favicon of application.
 Favicon: "FAVICON.ICO"
 
-# Lifetime of session (in seconds)
-SessionLifetime: 5
-
 # Namespace of all user content. All classes in /CONTENT folder
 # are expected to be in this namespace.
 # Example: assuming ContentNamespace is "MyApp"
@@ -58,6 +55,24 @@ SessionLifetime: 5
 # Note: this setting (with pathing mentioned in example above) is
 # case insensitive. So, namespace "MyApp" is the same as "MYAPP".
 ContentNamespace: "MyApp"
+
+
+# Lifetime of session (in seconds)
+SessionLifetime: 5
+
+# Flag, whether session should stay in single IP address or not.
+# Allowed values:
+#   True: single IP address is neccessary for session
+#   False: single IP address is not neccessary
+# When set to True, session will be flushed when IP address changes.
+SessionIP: True
+
+# Time frame for counter of requests (in seconds)
+SessionTimeframe: 5
+
+# Maximal number of reqeusts within defined time frame allowed
+# from one sesson.
+SessionRequests: 7
 
 # Flag, whether application should make logs.
 # Allowed values:

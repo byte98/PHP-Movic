@@ -22,6 +22,7 @@ namespace PHPMovic;
 use PHPMovic\Model\Configuration\Configuration;
 use PHPMovic\Model\Database\DatabaseManager;
 use PHPMovic\Model\Database\Driver;
+use PHPMovic\Model\Server\HttpStatus;
 use PHPMovic\Model\Server\Responder;
 use PHPMovic\Router\Router;
 use PHPMovic\Utils\Log\Logger;
@@ -146,36 +147,45 @@ class Application
     public function run(Request $request): void
     {
         Application::logger()->base("Incoming request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): " . $request->getResource());
-        $request->checkSession($this->configuration->getSessionLifetime());
-        $route = $this->router->route($request->getResource());
-        if ($route != null)
+        if ($request->checkSession($this->configuration->getSessionModel()) == false)
         {
-            $data = $route->getData($request->getResource());
-            $request->addData($data);
-            $controller = $route->getController();
-            Application::logger()->low("Route found: giving control to '" . $controller::class . "'.");
-            $response = null;
-            $start = DateUtils::now();
-            switch($request->getMethod())
+            $route = $this->router->route($request->getResource());
+            if ($route != null)
             {
-                case HttpMethod::GET:    $response = $controller->get($request); break;
-                case HttpMethod::POST:   $response = $controller->post($request); break;
-                case HttpMethod::PUT:    $response = $controller->put($request); break;
-                case HttpMethod::DELETE: $response = $controller->delete($request); break;
-            }
-            if ($response != null)
-            {
-                Application::logger()->low("Controller '" . $controller::class . "' finished its job in " . DateUtils::elapsed($start, DateUtils::now()) . " (response #" . $response->getNumber() . " to " . $response->getAddress() . ").");
-                $this->responder->respond($response);
+                $data = $route->getData($request->getResource());
+                $request->addData($data);
+                $controller = $route->getController();
+                Application::logger()->low("Route found: giving control to '" . $controller::class . "'.");
+                $response = null;
+                $start = DateUtils::now();
+                switch($request->getMethod())
+                {
+                    case HttpMethod::GET:    $response = $controller->get($request); break;
+                    case HttpMethod::POST:   $response = $controller->post($request); break;
+                    case HttpMethod::PUT:    $response = $controller->put($request); break;
+                    case HttpMethod::DELETE: $response = $controller->delete($request); break;
+                }
+                if ($response != null)
+                {
+                    Application::logger()->low("Controller '" . $controller::class . "' finished its job in " . DateUtils::elapsed($start, DateUtils::now()) . " (response #" . $response->getNumber() . " to " . $response->getAddress() . ").");
+                    $this->responder->respond($response);
+                }
+                else
+                {
+                    Application::logger()->error("Cannot respond to request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): response from controller is NULL!");
+                }
             }
             else
             {
-                Application::logger()->error("Cannot respond to request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): response from controller is NULL!");
+                Application::logger()->warning("Request cannot be handled: no route defined for '" . $request->getResource() . "'!");
             }
         }
         else
         {
-            Application::logger()->warning("Request cannot be handled: no route defined for '" . $request->getResource() . "'!");
+            Application::logger()->error("Request cannot be handled: too many requests!");
+            $response = $request->createResponse();
+            $response->setResponseCode(HttpStatus::TooManyRequests);
+            $this->responder->respond($response);
         }
         Application::$addonLoader->stopAll();
         Application::$databaseManager->closeAll();

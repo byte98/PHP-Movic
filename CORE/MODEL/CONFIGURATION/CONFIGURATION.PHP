@@ -78,9 +78,9 @@ class Configuration
     private readonly string $favicon;
 
     /**
-     * Life time of session (in seconds)
+     * Configuration of session.
      */
-    private readonly int $sessionLifetime;
+    private readonly SessionModel $session;
 
     /**
      * Creates new configuration of application.
@@ -93,7 +93,7 @@ class Configuration
      * @param string $timezone Default time zone of application.
      * @param CountersModel $countersModel Model of counters of application.
      * @param string $favicon Path to favicon of application.
-     * @param int $sessionLifetime Life time of session (in seconds).
+     * @param SessionModel $session Configuration of session.
      */
     public function __construct(
         DateTimeFormat $dateTimeFormat,
@@ -105,7 +105,7 @@ class Configuration
         string $timezone,
         CountersModel $countersModel,
         string $favicon,
-        int $sessionLifetime)
+        SessionModel $session)
     {
         $this->dateTimeFormat = $dateTimeFormat;
         $this->phpErrors = $phpErrors;
@@ -116,7 +116,7 @@ class Configuration
         $this->timezone = $timezone;
         $this->countersModel = $countersModel;
         $this->favicon = $favicon;
-        $this->sessionLifetime = $sessionLifetime;
+        $this->session = $session;
     }
 
     /**
@@ -202,12 +202,12 @@ class Configuration
     }
 
     /**
-     * Gets life time of session (in seconds).
-     * @return int Life time of session (in seconds).
+     * Gets model of session configuration.
+     * @return SessionModel Configuration of session.
      */
-    public function getSessionLifetime(): int
+    public function getSessionModel(): SessionModel
     {
-        return $this->sessionLifetime;
+        return $this->session;
     }
 }
 

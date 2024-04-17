@@ -73,7 +73,7 @@ class ConfigurationLoader
             $this->getTimeZone($data),
             $this->getCountersModel($data),
             $this->getFavicon($data),
-            $this->getSessionLifetime($data)
+            $this->getSessionModel($data)
         );
     }
 
@@ -90,6 +90,34 @@ class ConfigurationLoader
             $reti = $data["SessionLifetime"];
         }
         return $reti;
+    }
+
+    /**
+     * Parses a session configurtion from configuration data.
+     * @param array $data Parsed configuration data.
+     * @return SessionModel Configuration of session parsed from data.
+     */
+    private function getSessionModel(array $data): SessionModel
+    {
+        $timeout = 60;
+        $matchIP = true;
+        $reqTime = 5;
+        $reqCount = 10;
+    
+        if ($this->checkValue($data, "SessionLifetime", "integer")) {
+            $timeout = $data["SessionLifetime"];
+        }
+        if ($this->checkValue($data, "SessionIP", "boolean")) {
+            $matchIP = $data["SessionIP"];
+        }
+        if ($this->checkValue($data, "SessionTimeframe", "integer")) {
+            $reqTime = $data["SessionTimeframe"];
+        }
+        if ($this->checkValue($data, "SessionRequests", "integer")) {
+            $reqCount = $data["SessionRequests"];
+        }
+    
+        return new SessionModel($timeout, $matchIP, $reqTime, $reqCount);
     }
 
     /**
