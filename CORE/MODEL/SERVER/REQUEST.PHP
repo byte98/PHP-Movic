@@ -84,6 +84,10 @@ class Request
      */
     private readonly \DateTime $time;
 
+    /**
+     * Time (in seconds), when another request should be allowed.
+     */
+    private int $retry;
 
     /**
      * Creates new object representing request from
@@ -111,6 +115,7 @@ class Request
         $this->number = $counter->getValue();
         $counter->increment();
         $this->time = DateUtils::now();
+        $this->retry = 0;
         $_REQUEST = array();
         $_SESSION = array();
         $_COOKIE = array();
@@ -329,6 +334,7 @@ class Request
         {
             $reti = true;
         }
+        $this->retry = $handler->getRetry();
         return $reti;
     }
 
@@ -342,6 +348,15 @@ class Request
             unset($this->data[$key]);
         }
         $this->session = array();
+    }
+
+    /**
+     * Gets time (in seconds), when another try should be allowed.
+     * @return int Time (in seconds), when another try should be allowed.
+     */
+    public function getRetry(): int
+    {
+        return $this->retry;
     }
 }
 

@@ -185,6 +185,7 @@ class Application
             Application::logger()->error("Request cannot be handled: too many requests!");
             $response = $request->createResponse();
             $response->setResponseCode(HttpStatus::TooManyRequests);
+            $response->setHeader("Retry-After", strval($request->getRetry()));
             $this->responder->respond($response);
         }
         Application::$addonLoader->stopAll();

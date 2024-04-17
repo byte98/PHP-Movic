@@ -64,6 +64,11 @@ class SessionHandler
     private bool $limitExceeded;
 
     /**
+     * Number of seconds after retry should be allowed.
+     */
+    private int $retry;
+
+    /**
      * Creates new session handler.
      * @param array $data Data stored in session.
      * @param SessionModel $config Configuration of session.
@@ -78,6 +83,7 @@ class SessionHandler
         $this->parseData();
         $this->output = null;
         $this->limitExceeded = false;
+        $this->retry = 0;
     }
 
     /**
@@ -106,6 +112,7 @@ class SessionHandler
      */
     private function checkSession(): void
     {
+        $this->retry = 0;
         $this->limitExceeded = false;
         $expiration = $this->isExpired();
         if ($expiration === false)
@@ -159,11 +166,15 @@ class SessionHandler
             Application::logger()->info("Time frame has expired - creating new one");
             $this->frame = DateUtils::now();
             $this->requests = 0;
+            $valid = new \DateTime($this->frame->format("Y-m-d H:i:s"));
+            $valid = $valid->add($interval);
         }
         else
         {
             Application::logger()->low("Time frame is valid for " . DateUtils::elapsed(DateUtils::now(), $valid));
         }
+        $diff = $now->diff($valid);
+        $this->retry = abs($diff->s + ($diff->i * 60) + ($diff->h * 3600) + ($diff->days * 86400));
     }
 
     /**
@@ -236,6 +247,15 @@ class SessionHandler
             Application::logger()->debug("Session data has been already checked - skipping");
         }
         return $this->output;
+    }
+
+    /**
+     * Gets time (in seconds), when another try should be allowed.
+     * @return int Time (in seconds), when another try should be allowed.
+     */
+    public function getRetry(): int
+    {
+        return $this->retry;
     }
 }
 
