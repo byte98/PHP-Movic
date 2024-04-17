@@ -74,7 +74,7 @@ class SessionHandler
         $this->config = $config;
         $this->timer = DateUtils::now();
         $this->frame = DateUtils::now();
-        $this->requests = PHP_INT_MAX;
+        $this->requests = 0;
         $this->parseData();
         $this->output = null;
         $this->limitExceeded = false;
@@ -114,7 +114,7 @@ class SessionHandler
         }
         else
         {
-            Application::logger()->debug("Session is valid for " . DateUtils::elapsed(DateUtils::now(), $expiration));
+            Application::logger()->low("Session is valid for " . DateUtils::elapsed(DateUtils::now(), $expiration));
             $this->checkTimeFrame();
             $this->copyData();
             $this->requests++;
@@ -226,11 +226,16 @@ class SessionHandler
      */
     public function getData(): array
     {
-        if ($this->data === null)
+        if ($this->output === null)
         {
+            Application::logger()->debug("Session data is null - checking session");
             $this->checkSession();
         }
-        return $this->data;
+        else
+        {
+            Application::logger()->debug("Session data has been already checked - skipping");
+        }
+        return $this->output;
     }
 }
 
