@@ -147,7 +147,7 @@ class Application
     public function run(Request $request): void
     {
         Application::logger()->base("Incoming request(#" . StringUtils::intFloat($request->getNumber()) . " from " . $request->getAddress() . " [" . $request->getMethod()->toString() . "]): " . $request->getResource());
-        if ($request->checkSession($this->configuration->getSessionModel()) == false)
+        if ($request->checkSession($this->configuration->getSessionModel()) == true)
         {
             $route = $this->router->route($request->getResource());
             if ($route != null)
