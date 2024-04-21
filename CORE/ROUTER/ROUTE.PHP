@@ -44,6 +44,11 @@ class Route
     private readonly float $number;
 
     /**
+     * Array with aliases of route.
+     */
+    private array $aliases;
+
+    /**
      * Creates new route.
      * @param RoutePath $path Path of route.
      * @param Controller $controller Controller of route.
@@ -55,6 +60,7 @@ class Route
         $counter = Application::counters()->create("ROUTES");
         $this->number = $counter->getValue();
         $counter->increment();
+        $this->aliases = array();
     }
 
     /**
@@ -143,6 +149,44 @@ class Route
     {
         $reti = false;
         $reti = $this->path->matches($path);
+        if ($reti == false)
+        {
+            foreach($this->aliases as $alias)
+            {
+                if ($alias->matches($path))
+                {
+                    $reti = true;
+                    break;
+                }
+            }
+        }
+        return $reti;
+    }
+
+    /**
+     * Gets path of route to given request path.
+     * @param string $path Path of request.
+     * @return RoutePath Path of route,
+     *                  or NULL if no matching path has been found.
+     */
+    private function getPath(string $path): ?RoutePath
+    {
+        $reti = null;
+        if ($this->path->matches($path))
+        {
+            $reti = $this->path;
+        }
+        else
+        {
+            foreach($this->aliases as $alias)
+            {
+                if ($alias->matches($path))
+                {
+                    $reti = $alias;
+                    break;
+                }
+            }
+        }
         return $reti;
     }
 
@@ -157,6 +201,17 @@ class Route
     {
         $reti = false;
         $reti = $this->path->matchesString($path);
+        if ($reti == false)
+        {
+            foreach($this->aliases as $alias)
+            {
+                if ($alias->matchesString($path))
+                {
+                    $reti = true;
+                    break;
+                }
+            }
+        }
         return $reti;
     }
 
@@ -170,12 +225,34 @@ class Route
     }
 
     /**
+     * Gets length of path of route for given request.
+     * @param string $req Path of request.
+     * @return int Length of path.
+     */
+    public function getRequestLength(string $req): int
+    {
+        $reti = 0;
+        $path = $this->getPath($req);
+        if ($path != null)
+        {
+            $reti = $path->getLength();
+        }
+        return $reti;
+    }
+
+    /**
      * Gets data from request.
      * @param string $request Path to resource wanted by request.
      */
     public function getData(string $request): array
     {
-        return $this->path->getData($request);
+        $reti = array();
+        $path = $this->getPath($request);
+        if ($path != null)
+        {
+            $reti = $path->getData($request);
+        }
+        return $reti;
     }
 
     /**
@@ -187,6 +264,15 @@ class Route
     public function getNumber(): float
     {
         return $this->number;
+    }
+
+    /**
+     * Sets alias for route.
+     * @param string $path Path of alias.
+     */
+    public function setAlias(string $path): void
+    {
+        array_push($this->aliases, new RoutePath($path));
     }
 
 }

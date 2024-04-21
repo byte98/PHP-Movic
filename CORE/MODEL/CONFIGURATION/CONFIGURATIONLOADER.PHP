@@ -320,7 +320,7 @@ class ConfigurationLoader
     {
         $routes = array();
         $static = array();
-        $favicon = "";
+        $aliases = array();
         if ($this->checkValue($config, "Routes", "array"))
         {
             foreach($config["Routes"] as $key => $value)
@@ -335,7 +335,14 @@ class ConfigurationLoader
                 $static[$key] = $value;
             }
         }
-        return new RouterModel($routes, $static);
+        if ($this->checkValue($config, "Aliases", "array"))
+        {
+            foreach($config["Aliases"] as $key => $value)
+            {
+                $aliases[$key] = $value;
+            }
+        }
+        return new RouterModel($routes, $static, $aliases);
     }
 
     /**

@@ -33,15 +33,23 @@ class RouterModel
      * Array with all static routes from configuration.
      */
     private readonly array $staticRoutes;
+
+    /**
+     * Array with all route aliases from configuration.
+     */
+    private readonly array $aliases;
+
     /**
      * Creates new model of router.
      * @param array $routes Array with all routes from configuration.
      * @param array $staticRoutes Array with all static routes from configuration.
+     * @param array $aliases Array with all route aliases from configuration.
      */
-    public function __construct(array $routes, array $staticRoutes)
+    public function __construct(array $routes, array $staticRoutes, array $aliases)
     {
         $this->routes = $routes;
         $this->staticRoutes = $staticRoutes;
+        $this->aliases = $aliases;
     }
 
     /**
@@ -60,6 +68,15 @@ class RouterModel
     public function getStaticRoutes(): array
     {
         return $this->staticRoutes;
+    }
+
+    /**
+     * Gets array with all route aliases from configuration.
+     * @return array Array with all route aliases from configuration.
+     */
+    public function getAliases(): array
+    {
+        return $this->aliases;
     }
 }
 

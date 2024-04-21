@@ -176,3 +176,14 @@ Routes:
 StaticRoutes:
     "/static/css": "/STATIC/STYLES"
     "/static/js": "/STATIC/SCRIPTS"
+
+# Definitions of aliases of routes.
+# Syntax:
+# Aliases:
+#    "<alias>": "<path>"
+#    "<alias>": "<path>"
+# Where <alias> is path of request and <path> is path,
+# which will be used to route request.
+Aliases:
+    "/INDEX.PHP": "/"
+    "/INDEX.HTML": "/"

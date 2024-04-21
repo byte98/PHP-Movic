@@ -54,6 +54,7 @@ class Router
         $this->createFaviconRoute();
         $this->buildRoutingTable();
         $this->buildStaticRoutes();
+        $this->buildAliases();
         Application::logger()->info("Routing table contains " . count($this->routes) . " routes.");
     }
 
@@ -135,6 +136,34 @@ class Router
     }
 
     /**
+     * Builds aliases from configuration.
+     */
+    private function buildAliases(): void
+    {
+        foreach($this->configuration->getRoutes()->getAliases() as $key => $value)
+        {
+            Application::logger()->debug("Creating alias: '" . $key . "' -> '" . $value . "'");
+            if ($this->tableContains($value))
+            {
+                $route = $this->getExactRoute($value);
+                if ($route != null)
+                {
+                    $route->setAlias($key);
+                    Application::logger()->low("Alias '" . $key . "' created for route '" . $value . "'.");
+                }
+                else
+                {
+                    Application::logger()->warning("Cannot create alias for route '" . $key . "': route '" . $value . "' does not exist!");
+                }
+            }
+            else
+            {
+                Application::logger()->warning("Cannot create alias for route '" . $key . "': route '" . $value . "' has not been found!");
+            }
+        }
+    }
+
+    /**
      * Checks, whether there is already route in routing table
      * for given path.
      * @param string $path Path to check.
@@ -161,6 +190,26 @@ class Router
      * @return Route Route assigned to given path,
      *               or NULL if no route can be found.
      */
+    private function getExactRoute(string $path): ?Route
+    {
+        $reti = null;
+        foreach($this->routes as $route)
+        {
+            if ($route->matchesString($path))
+            {
+                $reti = $route;
+                break;
+            }
+        }
+        return $reti;
+    }
+
+    /**
+     * Gets route assigned to given path.
+     * @param string $path Path to check.
+     * @return Route Route assigned to given path,
+     *               or NULL if no route can be found.
+     */
     public function route(string $path): ?Route
     {
         $reti = null;
@@ -169,10 +218,10 @@ class Router
         {
             if ($route->matches($path))
             {
-                if ($route->getLength() > $retiLen)
+                if ($route->getRequestLength($path) > $retiLen)
                 {
                     $reti = $route;
-                    $retiLen = $route->getLength();
+                    $retiLen = $route->getRequestLength($path);
                     Application::logger()->debug("ROUTER:: route(#" . $route->getNumber() . ") with controller '" . $route->getController()::class . "' matches path " . $path . " and is current candidate.");
                 }
                 else
